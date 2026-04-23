@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>我的新项目</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#111111">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://s3plus.meituan.net/opapisdk/op_ticket_1_5677168484_1776959883963_Wvng4eSq.webp">
+
+    <!-- 引入华丽英文字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@200;300;400;600&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <!-- 框架 CSS -->
+    <link rel="stylesheet" href="css/00-variables.css">
+    <link rel="stylesheet" href="css/01-frame.css">
+    <link rel="stylesheet" href="css/02-modals.css">
+    
+    <!-- 模块化 CSS -->
+    <link rel="stylesheet" href="css/ashen-lockscreen.css">
+    <link rel="stylesheet" href="css/03-desktop.css">
+    <link rel="stylesheet" href="css/wechat.css">
+    <link rel="stylesheet" href="css/worldbook.css">
+    <link rel="stylesheet" href="css/cognition.css">
+
+</head>
+<body class="iphone-frame-body" style="font-family: 'Nunito', -apple-system, sans-serif;">
+    <div class="iphone-frame fullscreen-mode" id="main-frame">
+
+        <!-- ================= 1. 木质灰锁屏系统 ================= -->
+        <div class="bg-container"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+        <div class="glass-overlay" id="glassOverlay"></div>
+        <div class="shatter-container" id="shatterContainer">
+            <div class="shard shard-1"></div><div class="shard shard-2"></div><div class="shard shard-3"></div>
+            <div class="shard shard-4"></div><div class="shard shard-5"></div><div class="shard shard-6"></div>
+        </div>
+        <div class="flash-bang" id="flashBang"></div>
+
+        <div class="main-screen" id="mainScreen">
+            <div class="time-box">
+                <svg class="icon-lock" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <div class="time" id="clock">10:42</div>
+                <div class="date">TUESDAY, 24 OCTOBER</div>
+            </div>
+            <div class="greeting-box"><div class="g-en">Welcome Home, Master.</div><div class="g-cn">木质灰 · 专属空间</div></div>
+            <div class="notification-space"></div>
+            <div class="swipe-hint" id="swipeHint"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: block; margin: 0 auto 5px;"><path d="M18 15l-6-6-6 6"/></svg>Swipe up to unlock</div>
+        </div>
+
+        <div class="passcode-screen" id="passcodeScreen">
+            <div class="passcode-title">Enter Passcode</div>
+            <div class="dots-container" id="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            <div class="keypad">
+                <div class="key" onclick="pressKey('1')"><span class="key-num">1</span><span class="key-alpha"></span></div>
+                <div class="key" onclick="pressKey('2')"><span class="key-num">2</span><span class="key-alpha">A B C</span></div>
+                <div class="key" onclick="pressKey('3')"><span class="key-num">3</span><span class="key-alpha">D E F</span></div>
+                <div class="key" onclick="pressKey('4')"><span class="key-num">4</span><span class="key-alpha">G H I</span></div>
+                <div class="key" onclick="pressKey('5')"><span class="key-num">5</span><span class="key-alpha">J K L</span></div>
+                <div class="key" onclick="pressKey('6')"><span class="key-num">6</span><span class="key-alpha">M N O</span></div>
+                <div class="key" onclick="pressKey('7')"><span class="key-num">7</span><span class="key-alpha">P Q R S</span></div>
+                <div class="key" onclick="pressKey('8')"><span class="key-num">8</span><span class="key-alpha">T U V</span></div>
+                <div class="key" onclick="pressKey('9')"><span class="key-num">9</span><span class="key-alpha">W X Y Z</span></div>
+                <div class="key empty"></div>
+                <div class="key" onclick="pressKey('0')"><span class="key-num">0</span><span class="key-alpha"></span></div>
+                <div class="key empty"></div>
+            </div>
+            <div class="cancel-btn" onclick="hidePasscode()">Cancel</div>
+        </div>
+
+        <!-- ================= 2. 解锁后的桌面系统 ================= -->
+        <div class="desktop-container">
+            <!-- 状态栏 -->
+            <div class="desktop-status-bar">
+                <div id="desktop-clock">10:42</div>
+                <div class="status-right">
+                    <svg width="16" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C7.8 3 3.7 4.4.4 6.8l11.6 14.5L23.6 6.8C20.3 4.4 16.2 3 12 3zm0 3.2c2.8 0 5.4 1 7.4 2.6L12 18.2 4.6 8.8c2-1.6 4.6-2.6 7.4-2.6z"/></svg>
+                    <div class="battery"><div class="battery-level"></div></div>
+                </div>
+            </div>
+
+            <!-- 完成按钮 -->
+            <div class="btn-done" id="btnDone" onclick="exitEditMode()">DONE</div>
+
+            <!-- 滑动分页 -->
+            <div class="desktop-swiper" id="swiper">
+                <div class="desktop-page" id="page1"><div class="blueprint-grid"></div></div>
+                <div class="desktop-page" id="page2"><div class="blueprint-grid"></div></div>
+            </div>
+
+            <!-- 分页指示器 -->
+            <div class="page-dots">
+                <div class="dot active" id="dot1"></div>
+                <div class="dot" id="dot2"></div>
+            </div>
+
+            <!-- 底部 Dock -->
+            <div class="dock-area" id="dock"></div>
+
+            <!-- 隐藏的文件上传 -->
+            <input type="file" id="avatar-upload" hidden accept="image/*" onchange="handleAvatarUpload(event)">
+        </div>
+
+        <!-- ================= 3. 微信应用界面 ================= -->
+        <div class="wechat-app-container" id="wechatApp">
+            <div class="wc-status-bar">
+                <span id="wc-clock">11:44</span>
+                <div style="display:flex; gap:6px; align-items:center;">
+                    <svg width="16" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C7.8 3 3.7 4.4.4 6.8l11.6 14.5L23.6 6.8C20.3 4.4 16.2 3 12 3zm0 3.2c2.8 0 5.4 1 7.4 2.6L12 18.2 4.6 8.8c2-1.6 4.6-2.6 7.4-2.6z"/></svg>
+                    <svg width="20" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="18" height="12" rx="2"/><path d="M22 10v4"/></svg>
+                </div>
+            </div>
+
+            <!-- 视图 1：微信聊天 -->
+            <div id="wc-view-chats" class="wc-view-section active">
+                <div class="wc-top-section">
+                    <div class="wc-memory-title">Memory <span>▾</span></div>
+                    <div class="wc-custom-widget">
+                        <div class="wc-widget-clip wc-clip-1"></div>
+                        <div class="wc-widget-clip wc-clip-2"></div>
+                        <div class="wc-widget-inner">
+                            <div class="wc-widget-header"><span>@studio.zero</span><span>October 24th</span></div>
+                            <div class="wc-widget-body">
+                                <div class="wc-widget-avatar-wrap"><div class="wc-widget-avatar">✦</div></div>
+                                <div class="wc-widget-text-area">
+                                    <div><strong>Embrace the void.</strong></div>
+                                    <div>Less, but better.</div>
+                                    <div style="margin-top: 2px;">Silence is also a conversation. No noise, just focus.</div>
+                                    <div class="wc-widget-icons">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C7.8 3 3.7 4.4.4 6.8l11.6 14.5L23.6 6.8C20.3 4.4 16.2 3 12 3z"/></svg>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M8 12h8"/></svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="wc-widget-circle-img">Pic</div>
+                        </div>
+                        <div class="wc-widget-bubble">Keep it simple and elegant.</div>
+                    </div>
+                </div>
+
+                <div class="wc-nav-tabs">
+                    <div class="wc-tab active">Chats</div>
+                    <div class="wc-tab">Group<div class="wc-dot-indicator"></div></div>
+                    <div class="wc-tab">Friends</div>
+                </div>
+
+                <!-- 聊天列表容器（已清空，由 JS 渲染） -->
+                <div class="wc-chat-list" id="wc-chat-list"></div>
+            </div>
+
+            <!-- 视图 2：高级通讯录 -->
+            <div id="wc-view-contacts" class="wc-view-section">
+                <div class="wc-contacts-header">Directory</div>
+                <div class="wc-search-bar">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                    <input type="text" placeholder="Search...">
+                </div>
+                <div class="wc-action-list">
+                    <!-- 点击触发新建联系人弹窗 -->
+                    <div class="wc-action-item" onclick="openNewContactModal()">
+                        <div class="wc-action-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></div>
+                        <div class="wc-action-text">New Friends</div>
+                    </div>
+                    <div class="wc-action-item">
+                        <div class="wc-action-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                        <div class="wc-action-text">Group Chats</div>
+                    </div>
+                </div>
+                
+                <!-- 联系人列表容器（已清空，由 JS 渲染） -->
+                <div id="wc-contacts-list"></div>
+
+                <div class="wc-index-bar">
+                    <span>↑</span><span class="active">A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span><span>J</span><span>K</span><span>L</span><span>M</span><span>N</span><span>O</span><span>P</span><span>Q</span><span>R</span><span>S</span><span>T</span><span>U</span><span>V</span><span>W</span><span>X</span><span>Y</span><span>Z</span><span>#</span>
+                </div>
+            </div>
+
+            <!-- 视图 3：我 (Identity) -->
+            <div id="wc-view-me" class="wc-view-section" style="background:#f8f8f5;">
+                <div class="wc-me-header">
+                    <h1 class="wc-me-title">Identity.</h1>
+                    <div class="wc-me-subtitle">System Configuration & Personas</div>
+                </div>
+
+                <div class="wc-me-scroll" id="wcMeScroll">
+                    <!-- 现代名片区 -->
+                    <div class="wc-me-biz-card" id="wcMeCardContainer">
+                        <div class="wc-me-wax-seal"></div>
+                        <div class="wc-me-card-front" onclick="toggleWcMeExpand('wcMeCardContainer')">
+                            <div class="wc-me-avatar" id="wcMeAvatar">
+                                <img id="wcMeAvatarImg" src="" style="display:none;">
+                                <svg id="wcMeAvatarSvg" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </div>
+                            <div class="wc-me-info">
+                                <div class="wc-me-name" id="wcMeDisplayName">Master</div>
+                                <div class="wc-me-bio" id="wcMeDisplayBio">Welcome Home</div>
+                                <div class="wc-me-barcode"></div>
+                            </div>
+                        </div>
+
+                        <div class="wc-me-expand-content">
+                            <div class="wc-me-edit-area">
+                                <div class="wc-me-flat-input-group">
+                                    <span class="wc-me-flat-label">AVATAR UPLOAD</span>
+                                    <button class="wc-me-flat-btn" style="background:#f0f0f0; color:#111;" onclick="document.getElementById('wcMeAvatarUpload').click()">CHOOSE IMAGE</button>
+                                    <input type="file" id="wcMeAvatarUpload" accept="image/*" style="display:none;" onchange="previewWcMeAvatar(event)">
+                                </div>
+                                <div class="wc-me-flat-input-group">
+                                    <span class="wc-me-flat-label">DISPLAY NAME</span>
+                                    <input type="text" class="wc-me-flat-input" id="wcMeEditName" value="Master">
+                                </div>
+                                <div class="wc-me-flat-input-group">
+                                    <span class="wc-me-flat-label">SIGNATURE</span>
+                                    <input type="text" class="wc-me-flat-input" id="wcMeEditBio" value="Welcome Home">
+                                </div>
+                                <button class="wc-me-flat-btn" onclick="saveWcMeProfile()">SAVE PROFILE</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 上下文轮数设置 -->
+                    <div class="wc-me-section-divider"><span>MEMORY & CONTEXT</span></div>
+                    <div class="wc-me-list-item" id="wcContextContainer">
+                        <div class="wc-me-list-header" onclick="toggleWcMeExpand('wcContextContainer')">
+                            <div class="wc-me-list-title-wrap">
+                                <div class="wc-me-list-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                                <div>
+                                    <div class="wc-me-list-title">Context Rounds</div>
+                                    <span class="wc-me-list-sub">Memory span for AI replies</span>
+                                </div>
+                            </div>
+                            <div class="wc-me-list-arrow">+</div>
+                        </div>
+                        <div class="wc-me-expand-content">
+                            <div class="wc-me-flat-input-group">
+                                <span class="wc-me-flat-label">MESSAGE ROUNDS (1 ROUND = 1 USER + 1 AI)</span>
+                                <input type="number" class="wc-me-flat-input mono" id="wcMeContextRounds" placeholder="e.g. 10" value="10">
+                            </div>
+                            <div style="display:flex; gap:10px; margin-top:16px; padding-bottom:20px;">
+                                <button class="wc-me-flat-btn" style="flex:1;" onclick="saveWcMeContext()">SAVE</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 备用 API 设置 -->
+                    <div class="wc-me-section-divider"><span>CONNECTION</span></div>
+                    <div class="wc-me-list-item" id="wcApiContainer">
+                        <div class="wc-me-list-header" onclick="toggleWcMeExpand('wcApiContainer')">
+                            <div class="wc-me-list-title-wrap">
+                                <div class="wc-me-list-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg></div>
+                                <div>
+                                    <div class="wc-me-list-title">Backup API</div>
+                                    <span class="wc-me-list-sub">Custom Endpoint & Token</span>
+                                </div>
+                            </div>
+                            <div class="wc-me-list-arrow">+</div>
+                        </div>
+                        <div class="wc-me-expand-content">
+                            <div class="wc-me-flat-input-group">
+                                <span class="wc-me-flat-label">API URL</span>
+                                <input type="text" class="wc-me-flat-input mono" id="wcMeApiUrl" placeholder="https://api.example.com/v1">
+                            </div>
+                            <div class="wc-me-flat-input-group">
+                                <span class="wc-me-flat-label">API KEY (TOKEN)</span>
+                                <input type="password" class="wc-me-flat-input mono" id="wcMeApiToken" placeholder="sk-••••••••••••">
+                            </div>
+                            <div class="wc-me-flat-input-group">
+                                <span class="wc-me-flat-label">MODEL ID</span>
+                                <input type="text" class="wc-me-flat-input mono" id="wcMeApiModel" placeholder="gpt-4o-mini">
+                            </div>
+                            <div style="display:flex; gap:10px; margin-top:16px; padding-bottom:20px;">
+                                <button class="wc-me-flat-btn" style="background:#f0f0f0; color:#111; flex:1;" onclick="alert('Connection Test: OK')">TEST</button>
+                                <button class="wc-me-flat-btn" style="flex:1;" onclick="saveWcMeApi()">SAVE</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 面具管理 -->
+                    <div class="wc-me-section-divider"><span id="wcMeMaskCountBadge">MASKS (2)</span></div>
+                    <div class="wc-me-add-mask-btn" onclick="createWcMeMask()">
+                        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        CREATE NEW MASK
+                    </div>
+
+                    <div id="wcMeMaskListContainer">
+                        <div class="wc-me-list-item" id="wcMask1">
+                            <div class="wc-me-list-header" onclick="toggleWcMeExpand('wcMask1')">
+                                <div class="wc-me-list-title-wrap">
+                                    <div class="wc-me-list-icon"><svg viewBox="0 0 24 24"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></svg></div>
+                                    <div>
+                                        <div class="wc-me-list-title">Default Roleplay</div>
+                                        <span class="wc-me-list-sub">Active · Standard writing</span>
+                                    </div>
+                                </div>
+                                <div class="wc-me-list-arrow">+</div>
+                            </div>
+                            <div class="wc-me-expand-content">
+                                <div class="wc-me-flat-input-group">
+                                    <span class="wc-me-flat-label">MASK NAME</span>
+                                    <input type="text" class="wc-me-flat-input" value="Default Roleplay">
+                                </div>
+                                <div class="wc-me-flat-input-group">
+                                    <span class="wc-me-flat-label">SYSTEM PROMPT</span>
+                                    <textarea class="wc-me-flat-textarea">Write creatively and naturally. Stay in character.</textarea>
+                                </div>
+                                <button class="wc-me-flat-btn" onclick="closeWcMeContainer('wcMask1')">UPDATE MASK</button>
+                                <button class="wc-me-flat-btn-danger" style="margin-bottom:20px;" onclick="deleteWcMeMask('wcMask1')">DELETE</button>
+                            </div>
+                        </div>
+
+                        <div class="wc-me-list-item" id="wcMask2">
+                            <div class="wc-me-list-header" onclick="toggleWcMeExpand('wcMask2')">
+                                <div class="wc-me-list-title-wrap">
+                                    <div class="wc-me-list-icon"><svg viewBox="0 0 24 24"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg></div>
+                                    <div>
+                                        <div class="wc-me-list-title">Deep Thinker</div>
+                                        <span class="wc-me-list-sub">Analytical & philosophical</span>
+                                    </div>
+                                </div>
+                                <div class="wc-me-list-arrow">+</div>
+                            </div>
+                            <div class="wc-me-expand-content">
+                                <div class="wc-me-flat-input-group">
+                                    <span class="wc-me-flat-label">MASK NAME</span>
+                                    <input type="text" class="wc-me-flat-input" value="Deep Thinker">
+                                </div>
+                                <div class="wc-me-flat-input-group">
+                                    <span class="wc-me-flat-label">SYSTEM PROMPT</span>
+                                    <textarea class="wc-me-flat-textarea">Analyze the user's input logically step by step.</textarea>
+                                </div>
+                                <button class="wc-me-flat-btn" onclick="closeWcMeContainer('wcMask2')">UPDATE MASK</button>
+                                <button class="wc-me-flat-btn-danger" style="margin-bottom:20px;" onclick="deleteWcMeMask('wcMask2')">DELETE</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 悬浮底部导航栏 -->
+            <div class="wc-bottom-bar">
+                <div class="wc-tab-item active" onclick="switchWeChatTab('wc-view-chats', this)">
+                    <svg class="wc-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                    <span>微信</span>
+                </div>
+                <div class="wc-tab-item" onclick="switchWeChatTab('wc-view-contacts', this)">
+                    <svg class="wc-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <span>通讯录</span>
+                </div>
+                <div class="wc-tab-item">
+                    <svg class="wc-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
+                    <span>发现</span>
+                </div>
+                <div class="wc-tab-item" onclick="switchWeChatTab('wc-view-me', this)">
+                    <svg class="wc-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <span>我</span>
+                </div>
+            </div>
+            
+            <!-- 聊天对话界面 -->
+            <div class="wc-chat-view" id="wcChatView">
+                <div class="wc-chat-nav">
+                    <div class="wc-chat-nav-status">
+                        <span id="wc-chat-clock">13:20</span>
+                        <div style="display:flex; gap:6px; align-items:center;">
+                            <svg width="16" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C7.8 3 3.7 4.4.4 6.8l11.6 14.5L23.6 6.8C20.3 4.4 16.2 3 12 3z"/></svg>
+                            <svg width="20" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="18" height="12" rx="2"/><path d="M22 10v4"/></svg>
+                        </div>
+                    </div>
+                    <div class="wc-chat-nav-bar">
+                        <div class="wc-chat-back-btn" onclick="closeChatView()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                        </div>
+                        <div class="wc-chat-contact-avatar" id="wcChatAvatar">🤖</div>
+                        <div class="wc-chat-contact-info">
+                            <div class="wc-chat-contact-name" id="wcChatName">AI</div>
+                            <div class="wc-chat-contact-status">AI · Online</div>
+                        </div>
+                        <div class="wc-chat-more-btn" onclick="openChatSettings()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="#111"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wc-chat-messages" id="wcChatMessages">
+                    <div class="wc-chat-deco-watermark">DIALOGUE</div>
+                </div>
+
+                <!-- 聊天室设置界面 -->
+                <div class="wc-chat-settings" id="wcChatSettings">
+                    <div class="wc-cs-cross" style="top:85px;left:20px;"></div>
+                    <div class="wc-cs-cross" style="top:85px;right:20px;"></div>
+                    <div class="wc-cs-cross" style="bottom:40px;left:20px;"></div>
+                    <div class="wc-cs-cross" style="bottom:40px;right:20px;"></div>
+
+                    <svg class="wc-cs-bg-star" style="top:120px;right:30px;opacity:0.06;" width="16" height="16" viewBox="0 0 24 24" fill="#111"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+                    <svg class="wc-cs-bg-star" style="top:200px;left:25px;opacity:0.04;" width="12" height="12" viewBox="0 0 24 24" fill="#111"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+                    <svg class="wc-cs-bg-star" style="top:500px;right:40px;opacity:0.04;" width="10" height="10" viewBox="0 0 24 24" fill="#111"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+                    <svg class="wc-cs-bg-star" style="bottom:150px;left:35px;opacity:0.05;" width="14" height="14" viewBox="0 0 24 24" fill="#111"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+
+                    <div class="wc-cs-nav">
+                        <button class="wc-cs-back-btn" onclick="closeChatSettings()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                        </button>
+                        <div class="wc-cs-nav-title">Configuration</div>
+                        <button class="wc-cs-save-btn" onclick="saveChatSettings()">Save</button>
+                    </div>
+
+                    <div class="wc-cs-content">
+                        <div class="wc-cs-dual-hero">
+                            <svg class="wc-cs-dual-bg" viewBox="0 0 340 120" fill="none">
+                                <path d="M280 20 A 25 25 0 1 0 280 70 A 18 18 0 1 1 280 20Z" fill="#111"/>
+                                <circle cx="40" cy="25" r="1.5" fill="#111"/><circle cx="60" cy="45" r="1" fill="#111"/>
+                                <circle cx="100" cy="15" r="1.2" fill="#111"/><circle cx="150" cy="35" r="0.8" fill="#111"/>
+                                <circle cx="200" cy="20" r="1" fill="#111"/><circle cx="250" cy="50" r="1.3" fill="#111"/>
+                                <circle cx="300" cy="90" r="0.8" fill="#111"/><circle cx="80" cy="80" r="1" fill="#111"/>
+                                <circle cx="180" cy="95" r="1.2" fill="#111"/><circle cx="120" cy="60" r="0.6" fill="#111"/>
+                                <line x1="40" y1="25" x2="60" y2="45" stroke="#111" stroke-width="0.5"/>
+                                <line x1="60" y1="45" x2="100" y2="15" stroke="#111" stroke-width="0.5"/>
+                                <line x1="100" y1="15" x2="150" y2="35" stroke="#111" stroke-width="0.5"/>
+                                <line x1="200" y1="20" x2="250" y2="50" stroke="#111" stroke-width="0.5"/>
+                            </svg>
+
+                            <div class="wc-cs-dual-link">
+                                <svg class="wc-cs-olive wc-cs-olive-left" width="55" height="30" viewBox="0 0 55 30" fill="none" stroke="#111" stroke-width="1">
+                                    <path d="M0 15 Q15 15 25 15 Q35 15 45 15 L55 15"/>
+                                    <ellipse cx="12" cy="10" rx="5" ry="3" transform="rotate(-30 12 10)"/><ellipse cx="22" cy="8" rx="5" ry="3" transform="rotate(-20 22 8)"/>
+                                    <ellipse cx="32" cy="10" rx="5" ry="3" transform="rotate(-30 32 10)"/><ellipse cx="42" cy="8" rx="5" ry="3" transform="rotate(-15 42 8)"/>
+                                    <ellipse cx="12" cy="20" rx="5" ry="3" transform="rotate(30 12 20)"/><ellipse cx="22" cy="22" rx="5" ry="3" transform="rotate(20 22 22)"/>
+                                    <ellipse cx="32" cy="20" rx="5" ry="3" transform="rotate(30 32 20)"/><ellipse cx="42" cy="22" rx="5" ry="3" transform="rotate(15 42 22)"/>
+                                </svg>
+                                <div class="wc-cs-link-star">✦</div>
+                                <svg class="wc-cs-olive wc-cs-olive-right" width="55" height="30" viewBox="0 0 55 30" fill="none" stroke="#111" stroke-width="1">
+                                    <path d="M0 15 Q15 15 25 15 Q35 15 45 15 L55 15"/>
+                                    <ellipse cx="12" cy="10" rx="5" ry="3" transform="rotate(-30 12 10)"/><ellipse cx="22" cy="8" rx="5" ry="3" transform="rotate(-20 22 8)"/>
+                                    <ellipse cx="32" cy="10" rx="5" ry="3" transform="rotate(-30 32 10)"/><ellipse cx="42" cy="8" rx="5" ry="3" transform="rotate(-15 42 8)"/>
+                                    <ellipse cx="12" cy="20" rx="5" ry="3" transform="rotate(30 12 20)"/><ellipse cx="22" cy="22" rx="5" ry="3" transform="rotate(20 22 22)"/>
+                                    <ellipse cx="32" cy="20" rx="5" ry="3" transform="rotate(30 32 20)"/><ellipse cx="42" cy="22" rx="5" ry="3" transform="rotate(15 42 22)"/>
+                                </svg>
+                            </div>
+
+                            <div class="wc-cs-role-box">
+                                <span class="wc-cs-role-label">You</span>
+                                <div class="wc-cs-avatar-circle" id="wcCsUserAvatar" onclick="document.getElementById('wcCsUserAvatarInput').click()">
+                                    <img id="wcCsUserAvatarPreview" src="" style="display:none;">
+                                    <span id="wcCsUserAvatarEmoji">👤</span>
+                                    <div class="wc-cs-avatar-hint">Edit</div>
+                                </div>
+                                <input type="file" id="wcCsUserAvatarInput" accept="image/*" style="display:none;" onchange="previewCsAvatar(event,'user')">
+                                <input type="text" class="wc-cs-name-input" id="wcCsUserName" value="Me" placeholder="Your Name">
+                            </div>
+                            <div class="wc-cs-role-box">
+                                <span class="wc-cs-role-label">Persona</span>
+                                <div class="wc-cs-avatar-circle" id="wcCsAiAvatar" onclick="document.getElementById('wcCsAiAvatarInput').click()">
+                                    <img id="wcCsAiAvatarPreview" src="" style="display:none;">
+                                    <span id="wcCsAiAvatarEmoji">🤖</span>
+                                    <div class="wc-cs-avatar-hint">Edit</div>
+                                </div>
+                                <input type="file" id="wcCsAiAvatarInput" accept="image/*" style="display:none;" onchange="previewCsAvatar(event,'ai')">
+                                <input type="text" class="wc-cs-name-input" id="wcCsAiName" placeholder="AI Name">
+                            </div>
+                        </div>
+
+                        <!-- 用户的面具 (User Persona) -->
+                        <!-- 新增：Cognition 记忆库入口 -->
+                        <div class="wc-cs-ticket" style="cursor:pointer; transition:0.2s;" onclick="openCognition(currentChatContact.name)" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">
+                            <svg class="wc-cs-svg-deco" style="top:15px;right:15px;opacity:0.1;" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                            <div class="wc-cs-ticket-title">Cognition Archive</div>
+                            <div style="font-family:'Cormorant Garamond', serif; font-size:18px; font-weight:600; color:#111; margin-top:8px;">Manage AI Memory</div>
+                            <div style="font-family:'Space Mono', monospace; font-size:9px; color:#888; margin-top:4px;">Core / High / Trace</div>
+                        </div>
+
+                        <!-- 用户的面具 (User Persona) -->
+                        <div class="wc-cs-ticket">
+                            <div class="wc-cs-barcode"></div>
+                            <div class="wc-cs-ticket-title">Your Mask (User Persona)</div>
+                            
+                            <!-- 面具列表将由 js/wechat.js 动态渲染到这里 -->
+                            <div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin-top:12px;" id="wcCsMaskScroll"></div>
+                            
+                            <textarea class="wc-cs-persona-textarea" id="wcCsUserMask" placeholder="Describe YOUR persona here... This will be sent to the API as your background." style="margin-top:12px; min-height:60px;"></textarea>
+                            <style>
+                                #wcCsMaskScroll::-webkit-scrollbar { display: none; }
+                            </style>
+                        </div>
+
+                        <!-- AI 的系统提示词 (AI Persona) -->
+                        <div class="wc-cs-ticket">
+                            <div class="wc-cs-stamp"></div>
+                            <svg class="wc-cs-svg-deco" style="bottom:15px;left:15px;opacity:0.06;" width="60" height="60" viewBox="0 0 60 60" fill="none" stroke="#111" stroke-width="1">
+                                <path d="M30 10 Q35 20 30 30 Q25 20 30 10Z"/><path d="M30 10 Q40 15 35 25 Q30 18 30 10Z"/>
+                                <path d="M30 10 Q20 15 25 25 Q30 18 30 10Z"/><path d="M35 25 Q40 30 35 40 Q32 32 35 25Z"/>
+                                <path d="M25 25 Q20 30 25 40 Q28 32 25 25Z"/><path d="M30 30 Q32 40 30 50"/>
+                                <path d="M30 38 Q35 35 42 37"/><path d="M30 42 Q25 39 18 41"/>
+                            </svg>
+                            <div class="wc-cs-ticket-title">System Prompt</div>
+                            <textarea class="wc-cs-persona-textarea" id="wcCsPersona" placeholder="Describe the AI's personality, tone, and background story here..."></textarea>
+                        </div>
+
+                        <div class="wc-cs-ticket">
+                            <div class="wc-cs-barcode"></div>
+                            <svg class="wc-cs-svg-deco" style="top:14px;right:18px;opacity:0.08;" width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="#111" stroke-width="1.2">
+                                <polygon points="16,2 28,12 16,30 4,12"/><line x1="4" y1="12" x2="28" y2="12"/>
+                                <line x1="16" y1="2" x2="10" y2="12"/><line x1="16" y1="2" x2="22" y2="12"/>
+                                <line x1="10" y1="12" x2="16" y2="30"/><line x1="22" y1="12" x2="16" y2="30"/>
+                            </svg>
+                            <div class="wc-cs-ticket-title">Features</div>
+                            <div class="wc-cs-toggle-row">
+                                <div class="wc-cs-toggle-info">
+                                    <span class="wc-cs-toggle-title">Bilingual Translation</span>
+                                    <span class="wc-cs-toggle-desc">Auto-translate AI replies.</span>
+                                </div>
+                                <label class="wc-cs-switch"><input type="checkbox" id="wcCsBilingual"><span class="wc-cs-slider"></span></label>
+                            </div>
+                        </div>
+
+                        <div class="wc-cs-ticket" style="border:1px solid rgba(231,76,60,0.15);">
+                            <svg class="wc-cs-svg-deco" style="top:10px;right:15px;opacity:0.08;" width="36" height="28" viewBox="0 0 36 28" fill="none" stroke="#111" stroke-width="1">
+                                <path d="M18 14 Q10 2 2 8 Q6 16 18 14Z"/><path d="M18 14 Q26 2 34 8 Q30 16 18 14Z"/>
+                                <path d="M18 14 Q12 20 6 26 Q14 22 18 14Z"/><path d="M18 14 Q24 20 30 26 Q22 22 18 14Z"/>
+                                <line x1="18" y1="8" x2="18" y2="26"/><line x1="16" y1="6" x2="14" y2="2"/><line x1="20" y1="6" x2="22" y2="2"/>
+                            </svg>
+                            <div class="wc-cs-ticket-title" style="color:#e74c3c;">Danger Zone</div>
+                            <div class="wc-cs-toggle-row">
+                                <div class="wc-cs-toggle-info">
+                                    <span class="wc-cs-toggle-title" style="color:#e74c3c;">Clear History</span>
+                                    <span class="wc-cs-toggle-desc">Delete all messages permanently.</span>
+                                </div>
+                                <button class="wc-cs-clear-btn" onclick="clearChatHistory()">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    <div class="wc-chat-input-wrap">
+                        <!-- 改为：回车仅发送，绝不调取 AI -->
+                        <input type="text" id="wcChatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendWcMessageOnly()">
+                        
+                        <div class="wc-chat-input-extras">
+                            <div class="wc-extra-btn">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                            </div>
+                        </div>
+                        
+                        <div class="wc-send-group">
+                            <!-- 左键：仅发送 -->
+                            <button class="wc-btn-send" onclick="sendWcMessageOnly()" title="Send message">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                            </button>
+                            <!-- 右键：强制调取 AI -->
+                            <button class="wc-btn-ai" onclick="triggerAICall()" title="Force AI reply">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="wc-input-hint">
+                        <span>
+                            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                            Send
+                        </span>
+                        <span>
+                            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+                            AI Reply
+                        </span>
+                    </div>
+                </div>
+            </div>
+                <!-- 长按便签菜单 -->
+                <div class="wc-menu-overlay" id="wcMenuOverlay" onclick="closeWcContextMenu()"></div>
+                <div class="wc-context-menu" id="wcContextMenu">
+                    <div class="wc-memo-title">ACTION.</div>
+                    
+                    <div class="wc-menu-item" onclick="handleWcMenuAction('Redo')">
+                        <span>REDO</span>
+                        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    </div>
+                    <div class="wc-menu-item" onclick="handleWcMenuAction('Edit')">
+                        <span>EDIT</span>
+                        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </div>
+                    <div class="wc-menu-item" onclick="handleWcMenuAction('Quote')">
+                        <span>QUOTE</span>
+                        <svg viewBox="0 0 24 24"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1.5.5 1.5 1.5 0 2-3 2-3 2z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.5c0 2-3 2-3 2z"/></svg>
+                    </div>
+                    <div class="wc-menu-item danger" onclick="handleWcMenuAction('Delete')">
+                        <span>DEL</span>
+                        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    </div>
+                </div>
+
+            <!-- 编辑联系人弹窗 -->
+            <div class="wc-edit-overlay" id="wcEditContactModal">
+                <div class="wc-edit-modal">
+                    <div class="wc-edit-top-bar"></div>
+                    <div class="wc-edit-watermark">Edit</div>
+
+                    <div class="wc-edit-content">
+                        <div class="wc-edit-title">Edit Persona</div>
+                        <div class="wc-edit-subtitle">Modify AI Character</div>
+
+                        <div class="wc-edit-avatar-area">
+                            <div class="wc-edit-avatar-circle" id="wcEditAvatarCircle" onclick="document.getElementById('wcEditAvatarFileInput').click()">
+                                <img id="wcEditAvatarPreviewImg" src="" alt="">
+                                <div class="wc-edit-avatar-placeholder">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg>
+                                    <span>Change</span>
+                                </div>
+                            </div>
+                            <input type="file" id="wcEditAvatarFileInput" accept="image/*" style="display:none" onchange="previewEditAvatar(event)">
+                            <div class="wc-edit-avatar-right">
+                                <input type="text" class="wc-modal-field" id="wcEditContactName" placeholder="Character Name">
+                            </div>
+                        </div>
+
+                        <div class="wc-edit-group-section">
+                            <span class="wc-group-label">Group</span>
+                            <div class="wc-group-tags" id="wcEditGroupTags">
+                                <div class="wc-group-tag" onclick="selectWcTag(this)">Assistants</div>
+                                <div class="wc-group-tag" onclick="selectWcTag(this)">Roleplay</div>
+                                <div class="wc-group-tag" onclick="selectWcTag(this)">Creative</div>
+                                <div class="wc-group-tag" onclick="selectWcTag(this)">Study</div>
+                                <div class="wc-group-tag wc-group-tag-custom" onclick="customWcTag(this)">+ Custom</div>
+                            </div>
+                        </div>
+
+                        <div class="wc-edit-divider"></div>
+
+                        <div class="wc-edit-persona-section">
+                            <span class="wc-persona-label">Persona / System Prompt</span>
+                            <textarea class="wc-persona-textarea" id="wcEditContactPersona" placeholder="Describe this AI's personality..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="wc-edit-footer">
+                        <button class="wc-btn wc-btn-delete" onclick="deleteContact()">Delete</button>
+                        <button class="wc-btn wc-btn-cancel" onclick="closeEditContactModal()">Cancel</button>
+                        <button class="wc-btn wc-btn-save-edit" onclick="saveEditContact()">Save</button>
+                    </div>
+                    <div class="wc-edit-bottom-text">Studio Zero · Editor</div>
+                </div>
+            </div>
+
+            <!-- 底部横条用于关闭微信返回桌面 -->
+            <div class="wechat-home-bar" onclick="closeWeChat()"></div>
+
+            <!-- 新建联系人弹窗 -->
+            <div class="wc-modal-overlay" id="wcNewContactModal">
+                <div class="wc-modal">
+                    <div class="wc-modal-top-bar"></div>
+                    <div class="wc-modal-watermark">AI</div>
+
+                    <div class="wc-modal-content">
+                        <div class="wc-modal-title">New Persona</div>
+                        <div class="wc-modal-subtitle">Create AI Character</div>
+
+                        <div class="wc-avatar-upload-area">
+                            <div class="wc-avatar-circle" id="wcAvatarCircle" onclick="document.getElementById('wcAvatarFileInput').click()">
+                                <img id="wcAvatarPreviewImg" src="" alt="">
+                                <div class="wc-avatar-placeholder">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg>
+                                    <span>Upload</span>
+                                </div>
+                            </div>
+                            <input type="file" id="wcAvatarFileInput" accept="image/*" style="display:none" onchange="previewWcAvatar(event)">
+                            <div class="wc-avatar-right">
+                                <input type="text" class="wc-modal-field" id="wcContactName" placeholder="Character Name">
+                            </div>
+                        </div>
+
+                        <div class="wc-group-section">
+                            <span class="wc-group-label">Group</span>
+                            <div class="wc-group-tags" id="wcGroupTags">
+                                <div class="wc-group-tag active" onclick="selectWcTag(this)">Assistants</div>
+                                <div class="wc-group-tag" onclick="selectWcTag(this)">Roleplay</div>
+                                <div class="wc-group-tag" onclick="selectWcTag(this)">Creative</div>
+                                <div class="wc-group-tag" onclick="selectWcTag(this)">Study</div>
+                                <div class="wc-group-tag wc-group-tag-custom" onclick="customWcTag(this)">+ Custom</div>
+                            </div>
+                        </div>
+
+                        <div class="wc-modal-divider"></div>
+
+                        <div class="wc-persona-section">
+                            <span class="wc-persona-label">Persona / System Prompt</span>
+                            <textarea class="wc-persona-textarea" id="wcContactPersona" placeholder="Describe this AI's personality, tone, knowledge, and behavior..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="wc-modal-footer">
+                        <button class="wc-btn wc-btn-cancel" onclick="closeNewContactModal()">Cancel</button>
+                        <button class="wc-btn wc-btn-create" onclick="saveNewContact()">Create</button>
+                    </div>
+                    <div class="wc-modal-bottom-text">Powered by Studio Zero</div>
+                </div>
+            </div>
+        </div>
+        <!-- ================= 5. Cognition 记忆库 ================= -->
+        <div class="app-screen" id="cognitionApp">
+            <div class="cog-bg-watermark">M.</div>
+            <header class="cog-magazine-header">
+                <div class="cog-header-content">
+                    <div class="cog-top-meta">
+                        <button class="cog-back-btn" onclick="closeCognition()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                            BACK
+                        </button>
+                        <div>VOL. 01 — <span id="cogEntryCount">00</span></div>
+                    </div>
+                    <h1 class="cog-main-title">Cognition<br><span>Archive.</span></h1>
+                </div>
+            </header>
+
+            <nav class="cog-filter-nav">
+                <div class="cog-filter-item active" data-filter="ALL">ALL</div>
+                <div class="cog-filter-item" data-filter="CORE">CORE</div>
+                <div class="cog-filter-item" data-filter="HIGH">HIGH</div>
+                <div class="cog-filter-item" data-filter="TRACE">TRACE</div>
+            </nav>
+
+            <div class="cog-mem-container" id="cogMemList"></div>
+
+            <div class="cog-editor-overlay" id="cogEditor">
+                <div class="cog-edit-header">
+                    <span class="cog-edit-type-label" id="cogEditType">CORE MEMORY</span>
+                    <span class="cog-edit-date-display" id="cogEditDate">OCT 24, 2024</span>
+                </div>
+                <textarea class="cog-edit-textarea" id="cogEditText" placeholder="Begin typing..."></textarea>
+                <div class="cog-edit-footer">
+                    <div class="cog-priority-toggle">
+                        <div class="cog-p-dot dot-core" data-level="CORE" onclick="setCogPriority('CORE')"></div>
+                        <div class="cog-p-dot dot-high" data-level="HIGH" onclick="setCogPriority('HIGH')"></div>
+                        <div class="cog-p-dot dot-trace" data-level="TRACE" onclick="setCogPriority('TRACE')"></div>
+                    </div>
+                    <div class="cog-action-row">
+                        <button class="cog-btn-delete" id="cogBtnDelete" onclick="deleteCogMem()">DELETE</button>
+                        <button class="cog-btn-save" onclick="saveCogMem()">DONE.</button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="cog-fab" onclick="openCogEditor(null)">
+                <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+        </div>
+
+        <!-- ================= 4. 世界书 App (Archive) ================= -->
+        <div class="app-screen" id="worldbookApp">
+            <div class="wb-header">
+                <div class="wb-title-row">
+                    <div class="wb-title-left">
+                        <button class="wb-back-btn" onclick="closeWorldbook()">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                        </button>
+                        <h1 class="wb-title">Archive.</h1>
+                    </div>
+                    <div class="wb-count" id="wbCountBadge">0 ENTRIES</div>
+                </div>
+                <div class="wb-tabs">
+                    <div class="wb-tab active" onclick="filterWb('ALL', this)">ALL</div>
+                    <div class="wb-tab" onclick="filterWb('LOCATION', this)">LOCATIONS</div>
+                    <div class="wb-tab" onclick="filterWb('FACTION', this)">FACTIONS</div>
+                    <div class="wb-tab" onclick="filterWb('ARTIFACT', this)">ARTIFACTS</div>
+                    <div class="wb-tab" onclick="filterWb('CHARACTER', this)">CHARACTERS</div>
+                    <div class="wb-tab" onclick="filterWb('LORE', this)">LORE</div>
+                </div>
+            </div>
+            <div class="wb-list" id="wbList"></div>
+            <button class="wb-fab" onclick="createNewWbEntry()">
+                <svg viewBox="0 0 24 24" stroke="#fff" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+        </div>
+
+    <!-- 引入古典衬线字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+
+    <!-- ================= 3. 全屏高定设置界面 ================= -->
+    <div class="settings-overlay" id="settingsOverlay">
+        <div class="settings-frame">
+            <div class="settings-header-tag">System Prefs</div>
+            
+            <header class="settings-header">
+                <h1>Studio</h1>
+                <p>Configuration & Aesthetics</p>
+            </header>
+
+            <nav class="settings-nav">
+                <div class="settings-nav-item active" onclick="switchSettingsPage(0)">Appearance</div>
+                <div class="settings-nav-item" onclick="switchSettingsPage(1)">Advanced</div>
+            </nav>
+
+            <div class="settings-scroll-content">
+                <!-- 第一页：外观 -->
+                <div class="settings-page active" id="setPage0">
+                    <div class="settings-card">
+                        <span class="settings-card-label">Background / 壁纸</span>
+                        <div class="wallpaper-box">
+                            <div class="wallpaper-img-preview" id="setWgCover"></div>
+                            <div class="upload-trigger" onclick="triggerCoverUpload(event)">CLICK TO REPLACE</div>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <span class="settings-card-label">Custom Icons / 图标名称与自定义</span>
+                        <div class="settings-icon-grid" id="settingsIconGrid">
+                            <!-- 动态生成 -->
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <span class="settings-card-label">Typography / 字体排版</span>
+                        <div class="settings-slider-wrap">
+                            <div class="settings-slider-header">
+                                <span>界面缩放 (Scale)</span>
+                                <span id="sizeValText">100%</span>
+                            </div>
+                            <input type="range" min="80" max="130" value="100" oninput="updateSettingsVal('sizeValText', this.value + '%')">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第二页：开发者 -->
+                <div class="settings-page" id="setPage1">
+                    <div class="settings-card">
+    <span class="settings-card-label">API Presets / 服务器预设</span>
+    <div class="settings-preset-row">
+        <select class="settings-modern-select" id="apiPresetSelect" onchange="applyPresetSelection()">
+            <option value="">-- 选择预设 --</option>
+        </select>
+        <button class="settings-btn-save" onclick="deleteCurrentPreset()" style="background:#888; margin-right:5px;">DEL</button>
+        <button class="settings-btn-save" onclick="saveNewPreset()">ADD</button>
+    </div>
+</div>
+
+<div class="settings-card">
+    <span class="settings-card-label">Connection / 接口配置</span>
+    <div class="settings-input-group">
+        <label>接口地址 (URL)</label>
+        <input type="text" class="settings-modern-input" id="setApiUrl" placeholder="https://api.openai.com/v1">
+    </div>
+    <div class="settings-input-group">
+        <label>访问令牌 (Token)</label>
+        <input type="password" class="settings-modern-input" id="setApiToken" placeholder="sk-••••••••••••">
+    </div>
+    <div class="settings-input-group">
+        <label>选择模型 (Model)</label>
+        <select class="settings-modern-select" id="setApiModelSelect" style="width:100%;">
+            <option value="">-- 请先拉取模型 --</option>
+        </select>
+    </div>
+    <button class="settings-btn-save" onclick="fetchModels()" style="width:100%; margin-top:10px; background:#1a1a1a;">FETCH MODELS</button>
+</div>
+
+                    <div class="settings-card">
+                        <span class="settings-card-label">Model Control / 采样设置</span>
+                        <div class="settings-slider-wrap">
+                            <div class="settings-slider-header">
+                                <span>思维温度 (Temperature)</span>
+                                <span id="tempValText">0.7</span>
+                            </div>
+                            <input type="range" min="0" max="2" step="0.1" value="0.7" oninput="updateSettingsVal('tempValText', Number(this.value).toFixed(1))">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 悬浮火漆印章保存按钮 -->
+            <div class="seal-button" onclick="closeSettings()"></div>
+        </div>
+    </div>
+
+    <!-- 图标上传独立弹窗 -->
+    <div class="settings-modal-overlay" id="iconEditModal">
+        <div class="settings-modal">
+            <h3 id="iconEditTitle">Edit Icon</h3>
+            <div class="settings-modal-preview" id="iconEditPreview" onclick="document.getElementById('avatar-upload').click()">
+                <span style="font-size:30px; color:#ccc">+</span>
+            </div>
+            <div class="settings-modal-btns">
+                <button class="settings-btn-cancel" onclick="closeIconEditModal()">CANCEL</button>
+                <button class="settings-btn-confirm" onclick="closeIconEditModal()">APPLY</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入的 JS 文件 -->
+    <script src="js/app.js"></script>
+    <script src="js/wechat.js"></script>
+    <script src="js/worldbook.js"></script>
+    <script src="js/cognition.js"></script>
+</body>
+</html>
