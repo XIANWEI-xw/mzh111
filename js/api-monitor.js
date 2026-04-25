@@ -14,7 +14,159 @@ function updateAmFabVisibility() {
         if (amEnabled) conn.classList.add('visible');
         else conn.classList.remove('visible');
     }
+    updateConnectorPosition();
 }
+
+// ===== 悬浮球拖动系统 =====
+let orbDragState = {};
+
+function initOrbDrag(el, onTap) {
+    if (!el) return;
+    let state = { dragging: false, startX: 0, startY: 0, origX: 0, origY: 0, moved: false };
+
+    function getPos(e) {
+        const t = e.touches ? e.touches[0] : e;
+        return { x: t.clientX, y: t.clientY };
+    }
+
+    function onStart(e) {
+        const p = getPos(e);
+        state.startX = p.x;
+        state.startY = p.y;
+        state.origX = el.offsetLeft;
+        state.origY = el.offsetTop;
+        state.moved = false;
+        state.dragging = true;
+        el.style.transition = 'none';
+        el.style.zIndex = '9999';
+    }
+
+    function onMove(e) {
+        if (!state.dragging) return;
+        const p = getPos(e);
+        const dx = p.x - state.startX;
+        const dy = p.y - state.startY;
+
+        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+            state.moved = true;
+        }
+
+        if (state.moved) {
+            if (e.cancelable) e.preventDefault();
+            const newX = state.origX + dx;
+            const newY = state.origY + dy;
+
+            const maxX = window.innerWidth - el.offsetWidth;
+            const maxY = window.innerHeight - el.offsetHeight;
+
+            el.style.left = Math.max(0, Math.min(maxX, newX)) + 'px';
+            el.style.top = Math.max(0, Math.min(maxY, newY)) + 'px';
+            el.style.right = 'auto';
+            el.style.bottom = 'auto';
+
+            updateConnectorPosition();
+        }
+    }
+
+    function onEnd(e) {
+        if (!state.dragging) return;
+        state.dragging = false;
+        el.style.transition = '';
+        el.style.zIndex = '';
+
+        if (!state.moved) {
+            if (onTap) onTap();
+        } else {
+            snapToEdge(el);
+        }
+    }
+
+    el.addEventListener('touchstart', onStart, { passive: true });
+    el.addEventListener('touchmove', onMove, { passive: false });
+    el.addEventListener('touchend', onEnd);
+    el.addEventListener('mousedown', onStart);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onEnd);
+}
+
+function snapToEdge(el) {
+    const rect = el.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const halfW = window.innerWidth / 2;
+
+    el.style.transition = 'left 0.3s cubic-bezier(0.16,1,0.3,1), right 0.3s cubic-bezier(0.16,1,0.3,1)';
+
+    if (centerX < halfW) {
+        el.style.left = '12px';
+        el.style.right = 'auto';
+    } else {
+        el.style.left = (window.innerWidth - el.offsetWidth - 12) + 'px';
+        el.style.right = 'auto';
+    }
+
+    setTimeout(() => {
+        el.style.transition = '';
+        updateConnectorPosition();
+    }, 350);
+}
+
+function updateConnectorPosition() {
+    const fab = document.getElementById('apiFab');
+    const orb = document.getElementById('timerOrb');
+    const conn = document.getElementById('orbConnector');
+    if (!fab || !orb || !conn) return;
+
+    const fabRect = fab.getBoundingClientRect();
+    const orbRect = orb.getBoundingClientRect();
+
+    const fabCX = fabRect.left + fabRect.width / 2;
+    const fabCY = fabRect.top + fabRect.height / 2;
+    const orbCX = orbRect.left + orbRect.width / 2;
+    const orbCY = orbRect.top + orbRect.height / 2;
+
+    const dx = orbCX - fabCX;
+    const dy = orbCY - fabCY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist > 150) {
+        conn.style.display = 'none';
+        return;
+    }
+
+    const angle = Math.atan2(dy, dx) * (180 / Math.PI) - 90;
+    const startX = fabCX + (dx / dist) * (fabRect.width / 2);
+    const startY = fabCY + (dy / dist) * (fabRect.height / 2);
+    const lineLen = dist - fabRect.width / 2 - orbRect.width / 2;
+
+    if (lineLen <= 0) {
+        conn.style.display = 'none';
+        return;
+    }
+
+    conn.style.display = amEnabled ? 'block' : 'none';
+    conn.style.position = 'fixed';
+    conn.style.left = startX + 'px';
+    conn.style.top = startY + 'px';
+    conn.style.width = '1px';
+    conn.style.height = lineLen + 'px';
+    conn.style.transform = `rotate(${angle}deg)`;
+    conn.style.transformOrigin = 'top center';
+    conn.style.right = 'auto';
+    conn.style.bottom = 'auto';
+}
+
+// 初始化拖动
+(function initDragOnReady() {
+    function setup() {
+        initOrbDrag(document.getElementById('apiFab'), toggleApiMonitor);
+        initOrbDrag(document.getElementById('timerOrb'), toggleTimerPanel);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setup);
+    } else {
+        setTimeout(setup, 100);
+    }
+})();
 
 // ===== 计时器系统 =====
 let amTimerRunning = false;
