@@ -788,6 +788,9 @@ async function callChatAPI(contact, messages) {
     const tempEl = document.getElementById('tempValText');
     const temperature = settings.temp ? parseFloat(settings.temp) : (tempEl ? parseFloat(tempEl.textContent) : 0.7);
 
+    const amStartTime = Date.now();
+    if (typeof amSetCalling === 'function') amSetCalling(true);
+
     try {
         const response = await fetch(apiUrl + '/chat/completions', {
             method: 'POST',
@@ -803,9 +806,19 @@ async function callChatAPI(contact, messages) {
         });
 
         removeTypingIndicator();
+        if (typeof amSetCalling === 'function') amSetCalling(false);
 
         if (!response.ok) {
             const errorText = await response.text();
+            if (typeof logApiCall === 'function') {
+                logApiCall({
+                    model: model, source: 'WeChat', status: response.status, statusText: response.statusText,
+                    inputTokens: estimateTokens(apiMessages.map(m => typeof m.content === 'string' ? m.content : '').join('')),
+                    outputTokens: 0, duration: Date.now() - amStartTime,
+                    systemPrompt: apiMessages[0]?.content || '', errorText: errorText.substring(0, 500),
+                    messagesCount: apiMessages.length
+                });
+            }
             const errMsg = { role: 'bot', text: `⚠️ API Error ${response.status}: ${errorText}`, time: getCurrentTime() };
             chatMessages[contact.name].push(errMsg);
             appendChatMessageToDOM(errMsg);
@@ -814,6 +827,17 @@ async function callChatAPI(contact, messages) {
 
         const data = await response.json();
         const rawReply = data.choices?.[0]?.message?.content || '(No response)';
+
+        if (typeof logApiCall === 'function') {
+            const inTok = data.usage?.prompt_tokens || estimateTokens(apiMessages.map(m => typeof m.content === 'string' ? m.content : '').join(''));
+            const outTok = data.usage?.completion_tokens || estimateTokens(rawReply);
+            logApiCall({
+                model: model, source: 'WeChat', status: 200, statusText: 'OK',
+                inputTokens: inTok, outputTokens: outTok, duration: Date.now() - amStartTime,
+                systemPrompt: apiMessages[0]?.content || '', aiResponse: rawReply.substring(0, 1000),
+                messagesCount: apiMessages.length
+            });
+        }
 
         const parts = rawReply.split('||').map(s => s.trim()).filter(s => s.length > 0);
         
@@ -873,6 +897,14 @@ async function callChatAPI(contact, messages) {
 
     } catch (error) {
         removeTypingIndicator();
+        if (typeof amSetCalling === 'function') amSetCalling(false);
+        if (typeof logApiCall === 'function') {
+            logApiCall({
+                model: model, source: 'WeChat', status: 0, statusText: 'Network Error',
+                inputTokens: 0, outputTokens: 0, duration: Date.now() - amStartTime,
+                errorText: error.message
+            });
+        }
         const errMsg = { role: 'bot', text: `⚠️ Network Error: ${error.message}`, time: getCurrentTime() };
         chatMessages[contact.name].push(errMsg);
         appendChatMessageToDOM(errMsg);

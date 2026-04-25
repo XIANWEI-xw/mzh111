@@ -7,13 +7,73 @@ let cogCurrentEditType = 'HIGH';
 
 const cogWeight = { 'CORE': 3, 'HIGH': 2, 'TRACE': 1 };
 
-function loadCogData() {
-    const data = localStorage.getItem('cognitionData');
-    if (data) cogMemories = JSON.parse(data);
+const COG_DB_NAME = 'CognitionDB';
+const COG_STORE_NAME = 'CogStore';
+
+function initCogDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(COG_DB_NAME, 1);
+        request.onupgradeneeded = (e) => { e.target.result.createObjectStore(COG_STORE_NAME); };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
 }
 
+async function cogDbSet(key, value) {
+    try {
+        const db = await initCogDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(COG_STORE_NAME, 'readwrite');
+            tx.objectStore(COG_STORE_NAME).put(value, key);
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+        });
+    } catch (e) { console.error('CogDB write error:', e); }
+}
+
+async function cogDbGet(key) {
+    try {
+        const db = await initCogDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(COG_STORE_NAME, 'readonly');
+            const request = tx.objectStore(COG_STORE_NAME).get(key);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+    } catch (e) { console.error('CogDB read error:', e); return null; }
+}
+
+async function loadCogData() {
+    try {
+        const stored = await cogDbGet('cogMemories');
+        if (stored) {
+            cogMemories = stored;
+        } else {
+            const lsData = localStorage.getItem('cognitionData');
+            if (lsData) {
+                try {
+                    cogMemories = JSON.parse(lsData);
+                    await cogDbSet('cogMemories', cogMemories);
+                    localStorage.removeItem('cognitionData');
+                    console.log('✅ Cognition data migrated to IndexedDB');
+                } catch (e) { cogMemories = {}; }
+            }
+        }
+    } catch (e) {
+        console.error('Failed to load cognition data:', e);
+        try {
+            const lsData = localStorage.getItem('cognitionData');
+            if (lsData) cogMemories = JSON.parse(lsData);
+        } catch (e2) { cogMemories = {}; }
+    }
+}
+
+let cogSaveTimer = null;
 function saveCogData() {
-    localStorage.setItem('cognitionData', JSON.stringify(cogMemories));
+    clearTimeout(cogSaveTimer);
+    cogSaveTimer = setTimeout(() => {
+        cogDbSet('cogMemories', cogMemories);
+    }, 300);
 }
 
 function openCognition(contactName) {

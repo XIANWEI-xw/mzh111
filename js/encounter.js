@@ -808,6 +808,9 @@ async function callEncAI(apiUrl, apiToken, apiModel) {
     const temperature = settings.temp ? parseFloat(settings.temp) : (tempEl ? parseFloat(tempEl.textContent) : 0.8);
     const wordLimit = getEncWordLimit();
 
+    const amStartTime = Date.now();
+    if (typeof amSetCalling === 'function') amSetCalling(true);
+
     try {
         const response = await fetch(`${apiUrl.replace(/\/+$/, '')}/chat/completions`, {
             method: 'POST',
@@ -824,9 +827,18 @@ async function callEncAI(apiUrl, apiToken, apiModel) {
         });
 
         removeEncLoadingBlock();
+        if (typeof amSetCalling === 'function') amSetCalling(false);
 
         if (!response.ok) {
             const errorText = await response.text();
+            if (typeof logApiCall === 'function') {
+                logApiCall({
+                    model: apiModel, source: 'Encounter', status: response.status, statusText: response.statusText || 'Error',
+                    inputTokens: estimateTokens(apiMessages.map(m => m.content || '').join('')),
+                    outputTokens: 0, duration: Date.now() - amStartTime,
+                    systemPrompt: systemPrompt.substring(0, 1000), errorText: errorText.substring(0, 500)
+                });
+            }
             encProseContainer.insertAdjacentHTML('beforeend', `
                 <div class="enc-prose-divider">· · ·</div>
                 <div class="enc-story-block ai-block">
@@ -841,6 +853,17 @@ async function callEncAI(apiUrl, apiToken, apiModel) {
 
         const data = await response.json();
         const aiReply = data.choices?.[0]?.message?.content || '';
+
+        if (typeof logApiCall === 'function') {
+            const inTok = data.usage?.prompt_tokens || estimateTokens(apiMessages.map(m => m.content || '').join(''));
+            const outTok = data.usage?.completion_tokens || estimateTokens(aiReply);
+            logApiCall({
+                model: apiModel, source: 'Encounter', status: 200, statusText: 'OK',
+                inputTokens: inTok, outputTokens: outTok, duration: Date.now() - amStartTime,
+                systemPrompt: systemPrompt.substring(0, 1000), aiResponse: aiReply.substring(0, 1000),
+                messagesCount: apiMessages.length
+            });
+        }
 
         if (aiReply) {
             const formatted = formatEncAIReply(aiReply);
@@ -865,6 +888,14 @@ async function callEncAI(apiUrl, apiToken, apiModel) {
     } catch (e) {
         console.error('Encounter AI error:', e);
         removeEncLoadingBlock();
+        if (typeof amSetCalling === 'function') amSetCalling(false);
+        if (typeof logApiCall === 'function') {
+            logApiCall({
+                model: apiModel, source: 'Encounter', status: 0, statusText: 'Network Error',
+                inputTokens: 0, outputTokens: 0, duration: Date.now() - amStartTime,
+                errorText: e.message
+            });
+        }
         encProseContainer.insertAdjacentHTML('beforeend', `
             <div class="enc-prose-divider">· · ·</div>
             <div class="enc-story-block ai-block">

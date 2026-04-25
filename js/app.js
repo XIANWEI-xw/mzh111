@@ -281,6 +281,13 @@ function loadAllSettings() {
         document.getElementById('tempValText').innerText = savedSettings.temp || '0.7';
     }
     
+    const amToggle = document.getElementById('setAmToggle');
+    if (amToggle) {
+        const amOn = localStorage.getItem('amEnabled') === 'true';
+        amToggle.checked = amOn;
+        if (typeof updateAmFabVisibility === 'function') updateAmFabVisibility();
+    }
+
     const deskWall = localStorage.getItem('desktopWallpaper');
     if (deskWall) {
         const desktop = document.querySelector('.desktop-container');
