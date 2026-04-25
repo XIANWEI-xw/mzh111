@@ -1063,7 +1063,7 @@
                         <div class="enc-persona-title">Persona & Style</div>
                         <div class="enc-persona-subtitle">Configuration Protocol</div>
                     </div>
-                    <button class="enc-btn-close-persona" onclick="toggleEncPersonaPanel()">×</button>
+                    <button class="enc-btn-close-persona" onclick="closeEncPersonaPanel()">✦</button>
                 </div>
                 <div class="enc-persona-content">
                     <div class="enc-persona-item-group">
@@ -1175,7 +1175,7 @@
                     </div>
                 </div>
                 <div class="enc-persona-footer">
-                    <button class="enc-btn-persona-save" onclick="toggleEncPersonaPanel()">Apply Protocol</button>
+                    <button class="enc-btn-persona-save" onclick="closeEncPersonaPanel()">Apply Protocol</button>
                 </div>
             </div>
 
@@ -1258,9 +1258,9 @@
 
                 <div class="enc-story-header-glass">
                     <button class="enc-btn-back-glass" onclick="exitEncStory()"></button>
-                    <div class="enc-story-header-center">
-                        <div class="enc-avatar-glow">
-                            <div class="enc-story-hero-avatar-large" onclick="toggleEncPersonaPanel()" title="Persona Settings">
+                    <div class="enc-story-header-center" onclick="event.stopPropagation()">
+                        <div class="enc-avatar-glow" onclick="event.stopPropagation()">
+                            <div class="enc-story-hero-avatar-large" onclick="event.stopPropagation(); openEncPersonaPanel()" title="Persona Settings">
                                 <img src="" id="enc-story-hero-img" alt="Hero">
                             </div>
                         </div>
@@ -1327,9 +1327,9 @@
                     </div>
 
                     <div class="enc-input-row">
-                        <div class="enc-input-box">
-                            <textarea id="enc-user-input" placeholder="Write your response..." rows="1" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'"></textarea>
-                            <button class="enc-btn-send" onclick="sendEncAction()">Send</button>
+                        <div class="enc-input-box" onclick="document.getElementById('enc-user-input').focus()">
+                            <textarea id="enc-user-input" placeholder="Write your response..." rows="1" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'" onclick="event.stopPropagation()"></textarea>
+                            <button class="enc-btn-send" onclick="event.stopPropagation(); sendEncAction()">Send</button>
                         </div>
                     </div>
                     <div class="enc-input-hint"><span>Enter → Send</span><span>·</span><span>Shift+Enter → New line</span></div>
