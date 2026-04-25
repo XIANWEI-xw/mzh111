@@ -4,8 +4,6 @@
     right: 20px;
     bottom: 90px;
     touch-action: none;
-    user-select: none;
-    -webkit-user-select: none;
     width: 42px;
     height: 42px;
     border-radius: 50%;
@@ -150,8 +148,7 @@
 .timer-orb {
     position:fixed; right:16px; bottom:145px; z-index:9001; cursor:pointer;
     transition:all 0.4s cubic-bezier(0.4,0,0.2,1);
-    display:none;
-    touch-action:none; user-select:none; -webkit-user-select:none;
+    display:none; touch-action:none;
 }
 .timer-orb.visible { display:block; }
 .timer-orb:active { transform:scale(0.9); }
@@ -179,7 +176,7 @@
 @keyframes orbBlink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
 .orb-connector {
-    position:fixed; width:1px; height:14px;
+    position:fixed; right:40px; bottom:134px; width:1px; height:14px;
     background:linear-gradient(to bottom, rgba(30,27,23,0.1), rgba(30,27,23,0.04));
     z-index:8999; display:none;
     pointer-events:none;
