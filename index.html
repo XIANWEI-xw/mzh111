@@ -11,7 +11,7 @@
     <link rel="apple-touch-icon" href="https://s3plus.meituan.net/opapisdk/op_ticket_1_5677168484_1776959883963_Wvng4eSq.webp">
 
     <!-- 引入华丽英文字体 -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@200;300;400;600&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600;1,700&family=Space+Mono:wght@400;700&family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
 
     <!-- 框架 CSS -->
     <link rel="stylesheet" href="css/00-variables.css">
@@ -24,6 +24,8 @@
     <link rel="stylesheet" href="css/wechat.css">
     <link rel="stylesheet" href="css/worldbook.css">
     <link rel="stylesheet" href="css/cognition.css">
+    <link rel="stylesheet" href="css/notification.css">
+    <link rel="stylesheet" href="css/encounter.css">
 
 </head>
 <body class="iphone-frame-body" style="font-family: 'Nunito', -apple-system, sans-serif;">
@@ -359,25 +361,42 @@
             
             <!-- 聊天对话界面 -->
             <div class="wc-chat-view" id="wcChatView">
-                <div class="wc-chat-nav">
-                    <div class="wc-chat-nav-status">
+                <div class="haute-nav">
+                    <div class="haute-watermark" id="wcChatWatermark">A.</div>
+                    
+                    <div class="haute-status-bar">
                         <span id="wc-chat-clock">13:20</span>
                         <div style="display:flex; gap:6px; align-items:center;">
                             <svg width="16" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C7.8 3 3.7 4.4.4 6.8l11.6 14.5L23.6 6.8C20.3 4.4 16.2 3 12 3z"/></svg>
                             <svg width="20" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="18" height="12" rx="2"/><path d="M22 10v4"/></svg>
                         </div>
                     </div>
-                    <div class="wc-chat-nav-bar">
-                        <div class="wc-chat-back-btn" onclick="closeChatView()">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+
+                    <div class="haute-main">
+                        <div class="haute-left">
+                            <button class="haute-back-btn" onclick="closeChatView()">
+                                <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                            </button>
+                            <span class="haute-vol">CH. 01</span>
                         </div>
-                        <div class="wc-chat-contact-avatar" id="wcChatAvatar">🤖</div>
-                        <div class="wc-chat-contact-info">
-                            <div class="wc-chat-contact-name" id="wcChatName">AI</div>
-                            <div class="wc-chat-contact-status">AI · Online</div>
+
+                        <div class="haute-center">
+                            <div class="haute-name" id="wcChatName">AI</div>
+                            <div class="haute-meta">
+                                <div class="haute-dot"></div>
+                                <span>Neural Sync</span>
+                            </div>
                         </div>
-                        <div class="wc-chat-more-btn" onclick="openChatSettings()">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="#111"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+
+                        <div class="haute-right">
+                            <div class="haute-avatar-wrap">
+                                <div class="haute-avatar-ring"></div>
+                                <div id="wcChatAvatar" class="haute-avatar-inner">🤖</div>
+                            </div>
+                            <button class="haute-menu-btn" onclick="openChatSettings()">
+                                <span></span>
+                                <span></span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -388,203 +407,467 @@
 
                 <!-- 聊天室设置界面 -->
                 <div class="wc-chat-settings" id="wcChatSettings">
-                    <div class="wc-cs-cross" style="top:85px;left:20px;"></div>
-                    <div class="wc-cs-cross" style="top:85px;right:20px;"></div>
-                    <div class="wc-cs-cross" style="bottom:40px;left:20px;"></div>
-                    <div class="wc-cs-cross" style="bottom:40px;right:20px;"></div>
-
-                    <svg class="wc-cs-bg-star" style="top:120px;right:30px;opacity:0.06;" width="16" height="16" viewBox="0 0 24 24" fill="#111"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
-                    <svg class="wc-cs-bg-star" style="top:200px;left:25px;opacity:0.04;" width="12" height="12" viewBox="0 0 24 24" fill="#111"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
-                    <svg class="wc-cs-bg-star" style="top:500px;right:40px;opacity:0.04;" width="10" height="10" viewBox="0 0 24 24" fill="#111"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
-                    <svg class="wc-cs-bg-star" style="bottom:150px;left:35px;opacity:0.05;" width="14" height="14" viewBox="0 0 24 24" fill="#111"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
-
-                    <div class="wc-cs-nav">
-                        <button class="wc-cs-back-btn" onclick="closeChatSettings()">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                    <div class="cs-nav">
+                        <button class="cs-back" onclick="closeChatSettings()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
                         </button>
-                        <div class="wc-cs-nav-title">Configuration</div>
-                        <button class="wc-cs-save-btn" onclick="saveChatSettings()">Save</button>
+                        <span class="cs-title-center">Config</span>
+                        <button class="cs-save" onclick="saveChatSettings()">Save</button>
                     </div>
 
-                    <div class="wc-cs-content">
-                        <div class="wc-cs-dual-hero">
-                            <svg class="wc-cs-dual-bg" viewBox="0 0 340 120" fill="none">
-                                <path d="M280 20 A 25 25 0 1 0 280 70 A 18 18 0 1 1 280 20Z" fill="#111"/>
-                                <circle cx="40" cy="25" r="1.5" fill="#111"/><circle cx="60" cy="45" r="1" fill="#111"/>
-                                <circle cx="100" cy="15" r="1.2" fill="#111"/><circle cx="150" cy="35" r="0.8" fill="#111"/>
-                                <circle cx="200" cy="20" r="1" fill="#111"/><circle cx="250" cy="50" r="1.3" fill="#111"/>
-                                <circle cx="300" cy="90" r="0.8" fill="#111"/><circle cx="80" cy="80" r="1" fill="#111"/>
-                                <circle cx="180" cy="95" r="1.2" fill="#111"/><circle cx="120" cy="60" r="0.6" fill="#111"/>
-                                <line x1="40" y1="25" x2="60" y2="45" stroke="#111" stroke-width="0.5"/>
-                                <line x1="60" y1="45" x2="100" y2="15" stroke="#111" stroke-width="0.5"/>
-                                <line x1="100" y1="15" x2="150" y2="35" stroke="#111" stroke-width="0.5"/>
-                                <line x1="200" y1="20" x2="250" y2="50" stroke="#111" stroke-width="0.5"/>
-                            </svg>
-
-                            <div class="wc-cs-dual-link">
-                                <svg class="wc-cs-olive wc-cs-olive-left" width="55" height="30" viewBox="0 0 55 30" fill="none" stroke="#111" stroke-width="1">
-                                    <path d="M0 15 Q15 15 25 15 Q35 15 45 15 L55 15"/>
-                                    <ellipse cx="12" cy="10" rx="5" ry="3" transform="rotate(-30 12 10)"/><ellipse cx="22" cy="8" rx="5" ry="3" transform="rotate(-20 22 8)"/>
-                                    <ellipse cx="32" cy="10" rx="5" ry="3" transform="rotate(-30 32 10)"/><ellipse cx="42" cy="8" rx="5" ry="3" transform="rotate(-15 42 8)"/>
-                                    <ellipse cx="12" cy="20" rx="5" ry="3" transform="rotate(30 12 20)"/><ellipse cx="22" cy="22" rx="5" ry="3" transform="rotate(20 22 22)"/>
-                                    <ellipse cx="32" cy="20" rx="5" ry="3" transform="rotate(30 32 20)"/><ellipse cx="42" cy="22" rx="5" ry="3" transform="rotate(15 42 22)"/>
-                                </svg>
-                                <div class="wc-cs-link-star">✦</div>
-                                <svg class="wc-cs-olive wc-cs-olive-right" width="55" height="30" viewBox="0 0 55 30" fill="none" stroke="#111" stroke-width="1">
-                                    <path d="M0 15 Q15 15 25 15 Q35 15 45 15 L55 15"/>
-                                    <ellipse cx="12" cy="10" rx="5" ry="3" transform="rotate(-30 12 10)"/><ellipse cx="22" cy="8" rx="5" ry="3" transform="rotate(-20 22 8)"/>
-                                    <ellipse cx="32" cy="10" rx="5" ry="3" transform="rotate(-30 32 10)"/><ellipse cx="42" cy="8" rx="5" ry="3" transform="rotate(-15 42 8)"/>
-                                    <ellipse cx="12" cy="20" rx="5" ry="3" transform="rotate(30 12 20)"/><ellipse cx="22" cy="22" rx="5" ry="3" transform="rotate(20 22 22)"/>
-                                    <ellipse cx="32" cy="20" rx="5" ry="3" transform="rotate(30 32 20)"/><ellipse cx="42" cy="22" rx="5" ry="3" transform="rotate(15 42 22)"/>
-                                </svg>
+                    <div class="cs-scroll">
+                        <div class="cs-stamp-hero">
+                            <div class="cs-stamp-top">
+                                <span class="cs-stamp-label">Dialogue · Bond</span>
+                                <div class="cs-stamp-barcode"></div>
                             </div>
-
-                            <div class="wc-cs-role-box">
-                                <span class="wc-cs-role-label">You</span>
-                                <div class="wc-cs-avatar-circle" id="wcCsUserAvatar" onclick="document.getElementById('wcCsUserAvatarInput').click()">
-                                    <img id="wcCsUserAvatarPreview" src="" style="display:none;">
-                                    <span id="wcCsUserAvatarEmoji">👤</span>
-                                    <div class="wc-cs-avatar-hint">Edit</div>
+                            <div class="cs-duo-row">
+                                <div class="cs-person">
+                                    <span class="cs-person-tag">You</span>
+                                    <div class="cs-avatar-frame" onclick="document.getElementById('wcCsUserAvatarInput').click()">
+                                        <div class="cs-avatar-outer"></div>
+                                        <div class="cs-avatar-inner" id="wcCsUserAvatar">
+                                            <img id="wcCsUserAvatarPreview" src="" style="display:none;">
+                                            <span id="wcCsUserAvatarEmoji">👤</span>
+                                        </div>
+                                        <div class="cs-avatar-edit"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+                                    </div>
+                                    <input type="file" id="wcCsUserAvatarInput" accept="image/*" style="display:none;" onchange="previewCsAvatar(event,'user')">
+                                    <input type="text" class="cs-name-input" id="wcCsUserName" value="Me" placeholder="Your Name">
                                 </div>
-                                <input type="file" id="wcCsUserAvatarInput" accept="image/*" style="display:none;" onchange="previewCsAvatar(event,'user')">
-                                <input type="text" class="wc-cs-name-input" id="wcCsUserName" value="Me" placeholder="Your Name">
-                            </div>
-                            <div class="wc-cs-role-box">
-                                <span class="wc-cs-role-label">Persona</span>
-                                <div class="wc-cs-avatar-circle" id="wcCsAiAvatar" onclick="document.getElementById('wcCsAiAvatarInput').click()">
-                                    <img id="wcCsAiAvatarPreview" src="" style="display:none;">
-                                    <span id="wcCsAiAvatarEmoji">🤖</span>
-                                    <div class="wc-cs-avatar-hint">Edit</div>
+
+                                <div class="cs-link-area">
+                                    <div class="cs-link-wire"></div>
+                                    <div class="cs-link-diamond"></div>
+                                    <div class="cs-link-wire"></div>
                                 </div>
-                                <input type="file" id="wcCsAiAvatarInput" accept="image/*" style="display:none;" onchange="previewCsAvatar(event,'ai')">
-                                <input type="text" class="wc-cs-name-input" id="wcCsAiName" placeholder="AI Name">
-                            </div>
-                        </div>
 
-                        <!-- 用户的面具 (User Persona) -->
-                        <!-- 新增：Cognition 记忆库入口 -->
-                        <div class="wc-cs-ticket" style="cursor:pointer; transition:0.2s;" onclick="openCognition(currentChatContact.name)" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">
-                            <svg class="wc-cs-svg-deco" style="top:15px;right:15px;opacity:0.1;" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="1.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                            <div class="wc-cs-ticket-title">Cognition Archive</div>
-                            <div style="font-family:'Cormorant Garamond', serif; font-size:18px; font-weight:600; color:#111; margin-top:8px;">Manage AI Memory</div>
-                            <div style="font-family:'Space Mono', monospace; font-size:9px; color:#888; margin-top:4px;">Core / High / Trace</div>
-                        </div>
-
-                        <!-- 用户的面具 (User Persona) -->
-                        <div class="wc-cs-ticket">
-                            <div class="wc-cs-barcode"></div>
-                            <div class="wc-cs-ticket-title">Your Mask (User Persona)</div>
-                            
-                            <!-- 面具列表将由 js/wechat.js 动态渲染到这里 -->
-                            <div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin-top:12px;" id="wcCsMaskScroll"></div>
-                            
-                            <textarea class="wc-cs-persona-textarea" id="wcCsUserMask" placeholder="Describe YOUR persona here... This will be sent to the API as your background." style="margin-top:12px; min-height:60px;"></textarea>
-                            <style>
-                                #wcCsMaskScroll::-webkit-scrollbar { display: none; }
-                            </style>
-                        </div>
-
-                        <!-- AI 的系统提示词 (AI Persona) -->
-                        <div class="wc-cs-ticket">
-                            <div class="wc-cs-stamp"></div>
-                            <svg class="wc-cs-svg-deco" style="bottom:15px;left:15px;opacity:0.06;" width="60" height="60" viewBox="0 0 60 60" fill="none" stroke="#111" stroke-width="1">
-                                <path d="M30 10 Q35 20 30 30 Q25 20 30 10Z"/><path d="M30 10 Q40 15 35 25 Q30 18 30 10Z"/>
-                                <path d="M30 10 Q20 15 25 25 Q30 18 30 10Z"/><path d="M35 25 Q40 30 35 40 Q32 32 35 25Z"/>
-                                <path d="M25 25 Q20 30 25 40 Q28 32 25 25Z"/><path d="M30 30 Q32 40 30 50"/>
-                                <path d="M30 38 Q35 35 42 37"/><path d="M30 42 Q25 39 18 41"/>
-                            </svg>
-                            <div class="wc-cs-ticket-title">System Prompt</div>
-                            <textarea class="wc-cs-persona-textarea" id="wcCsPersona" placeholder="Describe the AI's personality, tone, and background story here..."></textarea>
-                        </div>
-
-                        <div class="wc-cs-ticket">
-                            <div class="wc-cs-barcode"></div>
-                            <svg class="wc-cs-svg-deco" style="top:14px;right:18px;opacity:0.08;" width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="#111" stroke-width="1.2">
-                                <polygon points="16,2 28,12 16,30 4,12"/><line x1="4" y1="12" x2="28" y2="12"/>
-                                <line x1="16" y1="2" x2="10" y2="12"/><line x1="16" y1="2" x2="22" y2="12"/>
-                                <line x1="10" y1="12" x2="16" y2="30"/><line x1="22" y1="12" x2="16" y2="30"/>
-                            </svg>
-                            <div class="wc-cs-ticket-title">Features</div>
-                            <div class="wc-cs-toggle-row">
-                                <div class="wc-cs-toggle-info">
-                                    <span class="wc-cs-toggle-title">Bilingual Translation</span>
-                                    <span class="wc-cs-toggle-desc">Auto-translate AI replies.</span>
+                                <div class="cs-person">
+                                    <span class="cs-person-tag">Persona</span>
+                                    <div class="cs-avatar-frame" onclick="document.getElementById('wcCsAiAvatarInput').click()">
+                                        <div class="cs-avatar-outer" style="transform:rotate(-3deg);"></div>
+                                        <div class="cs-avatar-inner" id="wcCsAiAvatar">
+                                            <img id="wcCsAiAvatarPreview" src="" style="display:none;">
+                                            <span id="wcCsAiAvatarEmoji">🤖</span>
+                                        </div>
+                                        <div class="cs-avatar-edit"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+                                    </div>
+                                    <input type="file" id="wcCsAiAvatarInput" accept="image/*" style="display:none;" onchange="previewCsAvatar(event,'ai')">
+                                    <input type="text" class="cs-name-input" id="wcCsAiName" placeholder="AI Name">
                                 </div>
-                                <label class="wc-cs-switch"><input type="checkbox" id="wcCsBilingual"><span class="wc-cs-slider"></span></label>
                             </div>
                         </div>
 
-                        <div class="wc-cs-ticket" style="border:1px solid rgba(231,76,60,0.15);">
-                            <svg class="wc-cs-svg-deco" style="top:10px;right:15px;opacity:0.08;" width="36" height="28" viewBox="0 0 36 28" fill="none" stroke="#111" stroke-width="1">
-                                <path d="M18 14 Q10 2 2 8 Q6 16 18 14Z"/><path d="M18 14 Q26 2 34 8 Q30 16 18 14Z"/>
-                                <path d="M18 14 Q12 20 6 26 Q14 22 18 14Z"/><path d="M18 14 Q24 20 30 26 Q22 22 18 14Z"/>
-                                <line x1="18" y1="8" x2="18" y2="26"/><line x1="16" y1="6" x2="14" y2="2"/><line x1="20" y1="6" x2="22" y2="2"/>
-                            </svg>
-                            <div class="wc-cs-ticket-title" style="color:#e74c3c;">Danger Zone</div>
-                            <div class="wc-cs-toggle-row">
-                                <div class="wc-cs-toggle-info">
-                                    <span class="wc-cs-toggle-title" style="color:#e74c3c;">Clear History</span>
-                                    <span class="wc-cs-toggle-desc">Delete all messages permanently.</span>
-                                </div>
-                                <button class="wc-cs-clear-btn" onclick="clearChatHistory()">Clear</button>
+                        <div class="cs-divider">
+                            <span class="cs-divider-num">01</span>
+                            <span class="cs-divider-tag">Memory</span>
+                            <div class="cs-divider-line"></div>
+                            <div class="cs-divider-dot"></div>
+                        </div>
+
+                        <div class="cs-ticket" onclick="openCognition(currentChatContact.name)">
+                            <div class="cs-ticket-left"><span>ARCHIVE</span></div>
+                            <div class="cs-ticket-body">
+                                <div class="cs-ticket-kicker">Cognition Archive</div>
+                                <div class="cs-ticket-title">Manage AI Memory</div>
+                                <div class="cs-ticket-sub">Core · High · Trace</div>
                             </div>
+                            <div class="cs-ticket-right">
+                                <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+                            </div>
+                        </div>
+
+                        <div class="cs-divider">
+                            <span class="cs-divider-num">02</span>
+                            <span class="cs-divider-tag">Your Mask</span>
+                            <div class="cs-divider-line"></div>
+                            <div class="cs-divider-dot"></div>
+                        </div>
+
+                        <div class="cs-mask-board">
+                            <div class="cs-mask-tape" id="wcCsMaskScroll"></div>
+                            <div class="cs-mask-textarea-wrap">
+                                <textarea class="cs-mask-textarea" id="wcCsUserMask" placeholder="Describe YOUR persona here..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="cs-divider">
+                            <span class="cs-divider-num">03</span>
+                            <span class="cs-divider-tag">System</span>
+                            <div class="cs-divider-line"></div>
+                            <div class="cs-divider-dot"></div>
+                        </div>
+
+                        <div class="cs-envelope">
+                            <div class="cs-envelope-flap">
+                                <span class="cs-envelope-flap-label">System Prompt</span>
+                            </div>
+                            <div class="cs-envelope-body">
+                                <div class="cs-envelope-head">
+                                    <div class="cs-envelope-title">
+                                        <div class="cs-envelope-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82V15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9c.15-.37.18-.8.04-1.18"/></svg></div>
+                                        <span class="cs-envelope-label">AI Personality</span>
+                                    </div>
+                                    <div class="cs-envelope-stamp"></div>
+                                </div>
+                                <textarea class="cs-envelope-textarea" id="wcCsPersona" placeholder="Describe the AI's personality, tone, and background story here..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="cs-divider">
+                            <span class="cs-divider-num">04</span>
+                            <span class="cs-divider-tag">Features</span>
+                            <div class="cs-divider-line"></div>
+                            <div class="cs-divider-dot"></div>
+                        </div>
+
+                        <div class="cs-feature-magazine">
+                            <div class="cs-fm-row">
+                                <div class="cs-fm-index">a.</div>
+                                <div class="cs-fm-content">
+                                    <div class="cs-fm-title">Bilingual Translation</div>
+                                    <div class="cs-fm-desc">Auto-translate AI replies</div>
+                                </div>
+                                <div class="cs-fm-action">
+                                    <label class="cs-switch"><input type="checkbox" id="wcCsBilingual"><span class="cs-switch-track"></span></label>
+                                </div>
+                            </div>
+                            <div class="cs-lang-drawer" id="wcCsBilingualOptions">
+                                <span class="cs-lang-label">Target Language</span>
+                                <div class="cs-lang-pills" id="wcCsLangChips">
+                                    <div class="cs-lang-pill active" onclick="selectBilingualLang(this, 'Chinese')">中文</div>
+                                    <div class="cs-lang-pill" onclick="selectBilingualLang(this, 'Japanese')">日本語</div>
+                                    <div class="cs-lang-pill" onclick="selectBilingualLang(this, 'Korean')">한국어</div>
+                                    <div class="cs-lang-pill" onclick="selectBilingualLang(this, 'English')">English</div>
+                                    <div class="cs-lang-pill" onclick="selectBilingualLang(this, 'French')">Français</div>
+                                    <div class="cs-lang-pill" onclick="selectBilingualLang(this, 'Spanish')">Español</div>
+                                </div>
+                                <input type="text" class="cs-lang-custom" id="wcCsCustomLang" placeholder="Or type custom language...">
+                            </div>
+                        </div>
+
+                        <div class="cs-divider">
+                            <span class="cs-divider-num">05</span>
+                            <span class="cs-divider-tag">Bubble Style</span>
+                            <div class="cs-divider-line"></div>
+                            <div class="cs-divider-dot"></div>
+                        </div>
+
+                        <div class="cs-style-card">
+                            <div class="cs-style-header">
+                                <div class="cs-style-label">AI Bubble Appearance</div>
+                                <div class="cs-style-current" id="csStyleCurrent">A</div>
+                            </div>
+                            <div class="cs-style-scroll" id="csStyleScroll">
+                                <div class="cs-style-option active" data-style="default" onclick="selectBubbleStyle(this, 'default')">
+                                    <div class="cs-style-preview">
+                                        <div class="cs-style-bubble cs-preview-default"></div>
+                                        <div class="cs-style-bubble-sm cs-preview-default"></div>
+                                    </div>
+                                    <div class="cs-style-name">Classic</div>
+                                    <div class="cs-style-code">○</div>
+                                </div>
+                                <div class="cs-style-option" data-style="a" onclick="selectBubbleStyle(this, 'a')">
+                                    <div class="cs-style-preview">
+                                        <div class="cs-style-bubble cs-preview-a"></div>
+                                        <div class="cs-style-bubble-sm cs-preview-a"></div>
+                                    </div>
+                                    <div class="cs-style-name">Left Bar</div>
+                                    <div class="cs-style-code">A</div>
+                                </div>
+                                <div class="cs-style-option" data-style="b" onclick="selectBubbleStyle(this, 'b')">
+                                    <div class="cs-style-preview">
+                                        <div class="cs-style-bubble cs-preview-b"></div>
+                                        <div class="cs-style-bubble-sm cs-preview-b"></div>
+                                    </div>
+                                    <div class="cs-style-name">Corner Cut</div>
+                                    <div class="cs-style-code">B</div>
+                                </div>
+                                <div class="cs-style-option" data-style="c" onclick="selectBubbleStyle(this, 'c')">
+                                    <div class="cs-style-preview">
+                                        <div class="cs-style-bubble cs-preview-c"></div>
+                                        <div class="cs-style-bubble-sm cs-preview-c"></div>
+                                    </div>
+                                    <div class="cs-style-name">Top Stripe</div>
+                                    <div class="cs-style-code">C</div>
+                                </div>
+                                <div class="cs-style-option" data-style="d" onclick="selectBubbleStyle(this, 'd')">
+                                    <div class="cs-style-preview">
+                                        <div class="cs-style-bubble cs-preview-d"></div>
+                                        <div class="cs-style-bubble-sm cs-preview-d"></div>
+                                    </div>
+                                    <div class="cs-style-name">Gradient</div>
+                                    <div class="cs-style-code">D</div>
+                                </div>
+                                <div class="cs-style-option" data-style="e" onclick="selectBubbleStyle(this, 'e')">
+                                    <div class="cs-style-preview">
+                                        <div class="cs-style-bubble cs-preview-e"></div>
+                                        <div class="cs-style-bubble-sm cs-preview-e"></div>
+                                    </div>
+                                    <div class="cs-style-name">Stamp Tag</div>
+                                    <div class="cs-style-code">E</div>
+                                </div>
+                                <div class="cs-style-option" data-style="f" onclick="selectBubbleStyle(this, 'f')">
+                                    <div class="cs-style-preview">
+                                        <div class="cs-style-bubble cs-preview-f"></div>
+                                        <div class="cs-style-bubble-sm cs-preview-f"></div>
+                                    </div>
+                                    <div class="cs-style-name">Paper Fold</div>
+                                    <div class="cs-style-code">F</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cs-divider">
+                            <span class="cs-divider-num">06</span>
+                            <span class="cs-divider-tag">Background</span>
+                            <div class="cs-divider-line"></div>
+                            <div class="cs-divider-dot"></div>
+                        </div>
+
+                        <div class="cs-bg-card">
+                            <div class="cs-bg-preview" id="wcCsBgPreview" onclick="document.getElementById('wcCsBgInput').click()">
+                                <div class="cs-bg-placeholder" id="wcCsBgPlaceholder">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M20.4 14.5L16 10 4 20"/></svg>
+                                    <span>UPLOAD WALLPAPER</span>
+                                </div>
+                            </div>
+                            <input type="file" id="wcCsBgInput" accept="image/*" style="display:none;" onchange="previewCsBg(event)">
+                            <div class="cs-bg-actions">
+                                <button class="cs-bg-btn" onclick="clearCsBg()">CLEAR</button>
+                            </div>
+                        </div>
+
+                        <div class="cs-divider">
+                            <span class="cs-divider-num">07</span>
+                            <span class="cs-divider-tag">Danger</span>
+                            <div class="cs-divider-line"></div>
+                            <div class="cs-divider-dot"></div>
+                        </div>
+
+                        <div class="cs-danger-zone">
+                            <div class="cs-danger-tear"></div>
+                            <div class="cs-danger-body">
+                                <div class="cs-danger-head">Danger Zone</div>
+                                <div class="cs-danger-row">
+                                    <div class="cs-danger-info">
+                                        <div class="cs-danger-title">Clear History</div>
+                                        <div class="cs-danger-desc">Delete all messages permanently</div>
+                                    </div>
+                                    <button class="cs-danger-btn" onclick="clearChatHistory()">Clear</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cs-divider">
+                            <span class="cs-divider-num">08</span>
+                            <span class="cs-divider-tag">Photo Style</span>
+                            <div class="cs-divider-line"></div>
+                            <div class="cs-divider-dot"></div>
+                        </div>
+
+                        <div class="cs-style-card">
+                            <div class="cs-style-header">
+                                <div class="cs-style-label">Sent Photo Appearance</div>
+                                <div class="cs-style-current" id="csPhotoCurrent">A</div>
+                            </div>
+                            <div class="cs-style-scroll" id="csPhotoScroll">
+                                <div class="cs-style-option active" data-style="a" onclick="selectPhotoStyle(this, 'a')">
+                                    <div class="cs-style-preview" style="align-items:center; justify-content:center;">
+                                        <div style="width:20px; height:24px; background:#fff; border-radius:2px; position:relative; box-shadow:0 2px 4px rgba(0,0,0,0.1); transform:rotate(-5deg);">
+                                            <div style="position:absolute; top:-2px; left:50%; transform:translateX(-50%); width:10px; height:4px; background:rgba(0,0,0,0.2);"></div>
+                                        </div>
+                                    </div>
+                                    <div class="cs-style-name">Polaroid</div>
+                                    <div class="cs-style-code">A</div>
+                                </div>
+                                <div class="cs-style-option" data-style="b" onclick="selectPhotoStyle(this, 'b')">
+                                    <div class="cs-style-preview" style="align-items:center; justify-content:center;">
+                                        <div style="width:24px; height:24px; background:#fff; border:1px solid rgba(255,255,255,0.5); border-radius:4px; display:flex; flex-direction:column;">
+                                            <div style="flex:1; background:rgba(255,255,255,0.2);"></div>
+                                            <div style="height:6px; background:#fff;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="cs-style-name">Gallery</div>
+                                    <div class="cs-style-code">B</div>
+                                </div>
+                                <div class="cs-style-option" data-style="c" onclick="selectPhotoStyle(this, 'c')">
+                                    <div class="cs-style-preview" style="align-items:center; justify-content:center;">
+                                        <div style="width:24px; height:24px; background:#111; border:1px solid rgba(255,255,255,0.2); border-radius:2px; display:flex; flex-direction:column; justify-content:space-between; padding:2px;">
+                                            <div style="width:100%; height:2px; background:rgba(255,255,255,0.5);"></div>
+                                            <div style="width:100%; height:2px; background:rgba(255,255,255,0.5);"></div>
+                                        </div>
+                                    </div>
+                                    <div class="cs-style-name">Film</div>
+                                    <div class="cs-style-code">C</div>
+                                </div>
+                                <div class="cs-style-option" data-style="d" onclick="selectPhotoStyle(this, 'd')">
+                                    <div class="cs-style-preview" style="align-items:center; justify-content:center;">
+                                        <div style="width:20px; height:26px; background:#111; border:1px solid rgba(255,255,255,0.2); border-radius:4px; display:flex; flex-direction:column;">
+                                            <div style="flex:1; background:rgba(255,255,255,0.1); margin:2px; border-radius:2px;"></div>
+                                            <div style="height:4px; background:repeating-linear-gradient(90deg, #fff 0, #fff 1px, transparent 1px, transparent 2px); margin:0 2px 2px; opacity:0.5;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="cs-style-name">Archive</div>
+                                    <div class="cs-style-code">D</div>
+                                </div>
+                                <div class="cs-style-option" data-style="e" onclick="selectPhotoStyle(this, 'e')">
+                                    <div class="cs-style-preview" style="align-items:center; justify-content:center;">
+                                        <div style="width:22px; height:26px; background:#fff; border-radius:4px; padding:2px 2px 6px; transform:rotate(5deg);">
+                                            <div style="width:100%; height:100%; background:rgba(0,0,0,0.1); border-radius:2px;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="cs-style-name">Slide</div>
+                                    <div class="cs-style-code">E</div>
+                                </div>
+                                <div class="cs-style-option" data-style="f" onclick="selectPhotoStyle(this, 'f')">
+                                    <div class="cs-style-preview" style="align-items:center; justify-content:center;">
+                                        <div style="width:24px; height:24px; background:rgba(255,255,255,0.2); border-radius:4px; position:relative;">
+                                            <div style="position:absolute; bottom:2px; left:50%; transform:translateX(-50%); width:12px; height:4px; background:rgba(0,0,0,0.5); border-radius:2px;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="cs-style-name">Raw Cut</div>
+                                    <div class="cs-style-code">F</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cs-footer">
+                            <div class="cs-footer-diamond"></div>
+                            <div class="cs-footer-text">Studio Zero · Configuration</div>
+                            <div class="cs-footer-line"></div>
                         </div>
                     </div>
                 </div>
-                    <div class="wc-chat-input-wrap">
-                        <!-- 改为：回车仅发送，绝不调取 AI -->
-                        <input type="text" id="wcChatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendWcMessageOnly()">
-                        
-                        <div class="wc-chat-input-extras">
-                            <div class="wc-extra-btn">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                    <div class="wc-chat-input-bar" style="position: relative; z-index: 100;">
+                        <!-- 悬浮黑色胶囊引用提示 -->
+                        <div class="hc-quote-capsule" id="quoteIndicator">
+                            <div class="hc-qc-line"></div>
+                            <div class="hc-qc-content">
+                                <span class="hc-qc-label">REPLY</span>
+                                <span class="hc-qc-text" id="quoteSnippet">...</span>
+                            </div>
+                            <div class="hc-qc-close" onclick="cancelWcQuote()">×</div>
+                        </div>
+
+                        <div class="wc-plus-menu" id="wcPlusMenu">
+                            <svg class="wc-plus-bg-svg" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="45" stroke-dasharray="2 4"/>
+                                <circle cx="50" cy="50" r="30"/>
+                                <circle cx="50" cy="50" r="15" stroke-dasharray="1 2"/>
+                                <line x1="50" y1="0" x2="50" y2="100"/>
+                                <line x1="0" y1="50" x2="100" y2="50"/>
+                                <path d="M15 15 L85 85 M15 85 L85 15" stroke-dasharray="4 4"/>
+                            </svg>
+
+                            <div class="wc-menu-cropmark crop-tl"><svg viewBox="0 0 20 20"><path d="M0 20 L0 0 L20 0 M0 10 L4 10 M10 0 L10 4"/></svg></div>
+                            <div class="wc-menu-cropmark crop-tr"><svg viewBox="0 0 20 20"><path d="M0 20 L0 0 L20 0 M0 10 L4 10 M10 0 L10 4"/></svg></div>
+                            <div class="wc-menu-cropmark crop-bl"><svg viewBox="0 0 20 20"><path d="M0 20 L0 0 L20 0 M0 10 L4 10 M10 0 L10 4"/></svg></div>
+                            <div class="wc-menu-cropmark crop-br"><svg viewBox="0 0 20 20"><path d="M0 20 L0 0 L20 0 M0 10 L4 10 M10 0 L10 4"/></svg></div>
+
+                            <div class="wc-plus-topbar">
+                                <div class="wc-plus-topbar-title">MODULES</div>
+                                <div class="wc-plus-barcode-group">
+                                    <span class="wc-plus-syscode">SYS.09X</span>
+                                    <div class="wc-plus-barcode"></div>
+                                </div>
+                            </div>
+
+                            <div class="wc-bento-grid">
+                                <div class="wc-bento-item bento-1" onclick="document.getElementById('wcPhotoUploadInput').click()">
+                                    <svg class="wc-bento-deco" viewBox="0 0 100 50" preserveAspectRatio="none"><path d="M0 25 L20 25 L30 10 L40 40 L50 25 L100 25"/></svg>
+                                    <span class="wc-bento-num">01</span>
+                                    <svg class="wc-bento-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                                    <span class="wc-bento-title">Lens <span>真实照片</span></span>
+                                </div>
+                                <input type="file" id="wcPhotoUploadInput" accept="image/*" style="display:none;" onchange="sendWcPhotoMessage(event)">
+
+                                <div class="wc-bento-item bento-white bento-2">
+                                    <div class="wc-bento-deco"></div>
+                                    <span class="wc-bento-num">02</span>
+                                    <svg class="wc-bento-icon" viewBox="0 0 24 24"><path d="M4 7V4h3m10 0h3v3M4 17v3h3m10 0h3v3M9 12h6"/></svg>
+                                    <span class="wc-bento-title">Scan <span>文字照片</span></span>
+                                </div>
+
+                                <div class="wc-bento-item bento-white bento-3">
+                                    <span class="wc-bento-num">03</span>
+                                    <svg class="wc-bento-icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                    <span class="wc-bento-title">Pay <span>转账</span></span>
+                                </div>
+
+                                <div class="wc-bento-item bento-white bento-4">
+                                    <span class="wc-bento-num">04</span>
+                                    <svg class="wc-bento-icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                    <span class="wc-bento-title">Loc <span>位置</span></span>
+                                </div>
+
+                                <div class="bento-empty">
+                                    <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                                    <span class="bento-empty-text">NULL</span>
+                                </div>
+
+                                <div class="bento-empty">
+                                    <svg viewBox="0 0 24 24" fill="none"><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                                    <span class="bento-empty-text">NULL</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="wc-chat-input-wrap">
+                            <input type="text" id="wcChatInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendWcMessageOnly()">
+                            
+                            <div class="wc-chat-input-extras">
+                                <div class="wc-extra-btn" id="clipBtn" onclick="toggleWcPlusMenu()">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                                </div>
+                            </div>
+                            
+                            <div class="wc-send-group">
+                                <button class="wc-btn-send" onclick="sendWcMessageOnly()" title="Send message">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                                </button>
+                                <button class="wc-btn-ai" onclick="triggerAICall()" title="Force AI reply">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+                                </button>
                             </div>
                         </div>
                         
-                        <div class="wc-send-group">
-                            <!-- 左键：仅发送 -->
-                            <button class="wc-btn-send" onclick="sendWcMessageOnly()" title="Send message">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                            </button>
-                            <!-- 右键：强制调取 AI -->
-                            <button class="wc-btn-ai" onclick="triggerAICall()" title="Force AI reply">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
-                            </button>
+                        <div class="wc-input-hint">
+                            <span>
+                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                                Send
+                            </span>
+                            <span>
+                                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
+                                AI Reply
+                            </span>
                         </div>
-                    </div>
-                    
-                    <div class="wc-input-hint">
-                        <span>
-                            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                            Send
-                        </span>
-                        <span>
-                            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6z"/></svg>
-                            AI Reply
-                        </span>
                     </div>
                 </div>
             </div>
-                <!-- 长按便签菜单 -->
-                <div class="wc-menu-overlay" id="wcMenuOverlay" onclick="closeWcContextMenu()"></div>
-                <div class="wc-context-menu" id="wcContextMenu">
-                    <div class="wc-memo-title">ACTION.</div>
-                    
-                    <div class="wc-menu-item" onclick="handleWcMenuAction('Redo')">
-                        <span>REDO</span>
-                        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                <!-- 高定横向滑动长按菜单 -->
+                <div class="hc-menu-overlay" id="wcMenuOverlay" onclick="closeWcContextMenu()"></div>
+                
+                <!-- 新增：独立的回溯时间线 (长按时出现在消息下方) -->
+                <div class="wc-rewind-line-overlay" id="wcRewindLine" onclick="executeWcRewind()">
+                    <div class="rewind-c-line"></div>
+                    <div class="rewind-c-btn">
+                        <div class="rewind-c-icon">
+                            <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                        </div>
+                        <span class="rewind-c-text">Backtrack</span>
                     </div>
-                    <div class="wc-menu-item" onclick="handleWcMenuAction('Edit')">
-                        <span>EDIT</span>
-                        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                    </div>
-                    <div class="wc-menu-item" onclick="handleWcMenuAction('Quote')">
-                        <span>QUOTE</span>
-                        <svg viewBox="0 0 24 24"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1.5.5 1.5 1.5 0 2-3 2-3 2z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.5c0 2-3 2-3 2z"/></svg>
-                    </div>
-                    <div class="wc-menu-item danger" onclick="handleWcMenuAction('Delete')">
-                        <span>DEL</span>
-                        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    <div class="rewind-c-line"></div>
+                </div>
+
+                <div class="hc-context-outer" id="wcContextMenu">
+                    <div class="hc-bar-tag">ACTION</div>
+                    <div class="hc-context-scroll">
+                        <div class="hc-bar-btn" onclick="handleWcMenuAction('Edit')"><span>Edit</span></div>
+                        <div class="hc-bar-btn dark" onclick="handleWcMenuAction('Quote')"><span>Quote</span></div>
+                        <div class="hc-bar-btn" onclick="handleWcMenuAction('Redo')"><span>Redo</span></div>
+                        <div class="hc-bar-btn" onclick="handleWcMenuAction('Copy')"><span>Copy</span></div>
+                        <div class="hc-bar-btn danger" onclick="handleWcMenuAction('Delete')"><span>Del</span></div>
                     </div>
                 </div>
 
@@ -696,51 +979,362 @@
         </div>
         <!-- ================= 5. Cognition 记忆库 ================= -->
         <div class="app-screen" id="cognitionApp">
-            <div class="cog-bg-watermark">M.</div>
-            <header class="cog-magazine-header">
-                <div class="cog-header-content">
-                    <div class="cog-top-meta">
-                        <button class="cog-back-btn" onclick="closeCognition()">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-                            BACK
-                        </button>
-                        <div>VOL. 01 — <span id="cogEntryCount">00</span></div>
+            <div class="cog-hero">
+                <div class="cog-hero-watermark">M.</div>
+                <div class="cog-hero-top">
+                    <button class="cog-back" onclick="closeCognition()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                    </button>
+                    <div class="cog-hero-meta">
+                        <div class="cog-hero-meta-dot"></div>
+                        <span>Vol. 01</span>
                     </div>
-                    <h1 class="cog-main-title">Cognition<br><span>Archive.</span></h1>
                 </div>
-            </header>
-
-            <nav class="cog-filter-nav">
-                <div class="cog-filter-item active" data-filter="ALL">ALL</div>
-                <div class="cog-filter-item" data-filter="CORE">CORE</div>
-                <div class="cog-filter-item" data-filter="HIGH">HIGH</div>
-                <div class="cog-filter-item" data-filter="TRACE">TRACE</div>
-            </nav>
-
-            <div class="cog-mem-container" id="cogMemList"></div>
-
-            <div class="cog-editor-overlay" id="cogEditor">
-                <div class="cog-edit-header">
-                    <span class="cog-edit-type-label" id="cogEditType">CORE MEMORY</span>
-                    <span class="cog-edit-date-display" id="cogEditDate">OCT 24, 2024</span>
+                <div class="cog-hero-title-area">
+                    <h1 class="cog-hero-title">Cognition<span>Archive.</span></h1>
+                    <div class="cog-hero-subtitle">Persistent Memory System</div>
                 </div>
-                <textarea class="cog-edit-textarea" id="cogEditText" placeholder="Begin typing..."></textarea>
-                <div class="cog-edit-footer">
-                    <div class="cog-priority-toggle">
-                        <div class="cog-p-dot dot-core" data-level="CORE" onclick="setCogPriority('CORE')"></div>
-                        <div class="cog-p-dot dot-high" data-level="HIGH" onclick="setCogPriority('HIGH')"></div>
-                        <div class="cog-p-dot dot-trace" data-level="TRACE" onclick="setCogPriority('TRACE')"></div>
+                <div class="cog-stats-bar">
+                    <div class="cog-stat-item">
+                        <div class="cog-stat-dot core"></div>
+                        <div class="cog-stat-num" id="cogStatCore">0</div>
+                        <div class="cog-stat-label">Core</div>
                     </div>
-                    <div class="cog-action-row">
-                        <button class="cog-btn-delete" id="cogBtnDelete" onclick="deleteCogMem()">DELETE</button>
-                        <button class="cog-btn-save" onclick="saveCogMem()">DONE.</button>
+                    <div class="cog-stat-item">
+                        <div class="cog-stat-dot high"></div>
+                        <div class="cog-stat-num" id="cogStatHigh">0</div>
+                        <div class="cog-stat-label">High</div>
+                    </div>
+                    <div class="cog-stat-item">
+                        <div class="cog-stat-dot trace"></div>
+                        <div class="cog-stat-num" id="cogStatTrace">0</div>
+                        <div class="cog-stat-label">Trace</div>
+                    </div>
+                    <div class="cog-stat-item">
+                        <div class="cog-stat-num" id="cogStatTotal">0</div>
+                        <div class="cog-stat-label">Total</div>
                     </div>
                 </div>
             </div>
 
-            <button class="cog-fab" onclick="openCogEditor(null)">
-                <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            <div class="cog-filter-bar">
+                <div class="cog-filter-btn active" data-filter="ALL" onclick="filterCog('ALL', this)">ALL</div>
+                <div class="cog-filter-btn" data-filter="CORE" onclick="filterCog('CORE', this)">CORE</div>
+                <div class="cog-filter-btn" data-filter="HIGH" onclick="filterCog('HIGH', this)">HIGH</div>
+                <div class="cog-filter-btn" data-filter="TRACE" onclick="filterCog('TRACE', this)">TRACE</div>
+            </div>
+
+            <div class="cog-list" id="cogMemList"></div>
+
+            <div class="cog-fab">
+                <button class="cog-fab-main" onclick="openCogEditor(null)">
+                    <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                </button>
+                <div class="cog-fab-label">New Memory</div>
+            </div>
+
+            <div class="cog-editor" id="cogEditor">
+                <div class="cog-edit-top">
+                    <div class="cog-edit-type" id="cogEditType">CORE MEMORY</div>
+                    <div class="cog-edit-date" id="cogEditDate">OCT 24, 2024</div>
+                </div>
+                <textarea class="cog-edit-textarea" id="cogEditText" placeholder="Begin typing..."></textarea>
+                <div class="cog-edit-bottom">
+                    <div class="cog-priority-row">
+                        <div class="cog-p-btn active-core" data-level="CORE" onclick="setCogPriority('CORE')">● Core</div>
+                        <div class="cog-p-btn" data-level="HIGH" onclick="setCogPriority('HIGH')">◆ High</div>
+                        <div class="cog-p-btn" data-level="TRACE" onclick="setCogPriority('TRACE')">○ Trace</div>
+                    </div>
+                    <div class="cog-edit-actions">
+                        <button class="cog-btn-del" id="cogBtnDelete" onclick="deleteCogMem()">DELETE</button>
+                        <button class="cog-btn-done" onclick="saveCogMem()">DONE.</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= 7. Encounter 小说模式 ================= -->
+        <div class="app-screen" id="encounterApp">
+
+            <!-- 角色设定全屏面板 -->
+            <div class="enc-persona-overlay" id="enc-persona-overlay">
+                <div class="enc-persona-header">
+                    <div>
+                        <div class="enc-persona-title">Persona & Style</div>
+                        <div class="enc-persona-subtitle">Configuration Protocol</div>
+                    </div>
+                    <button class="enc-btn-close-persona" onclick="toggleEncPersonaPanel()">×</button>
+                </div>
+                <div class="enc-persona-content">
+                    <div class="enc-persona-item-group">
+                        <div class="enc-persona-item-header" onclick="toggleEncPersonaGroup(this)">
+                            <span class="enc-persona-item-title">Tone of Voice <i>(文风设定)</i></span>
+                            <span class="enc-persona-item-icon">+</span>
+                        </div>
+                        <div class="enc-persona-item-body-wrapper">
+                            <div class="enc-persona-item-body">
+                                <div class="enc-preset-list">
+                                    <div class="enc-preset-block selected">
+                                        <div class="enc-preset-view">
+                                            <div class="enc-preset-info" onclick="toggleEncPreset(this)">
+                                                <div class="enc-preset-name">冷峻克制</div>
+                                                <div class="enc-preset-text">语言简练，带着不易察觉的温柔。多用动作描写代替直接的情感表达，喜欢使用暗喻。</div>
+                                            </div>
+                                            <div class="enc-preset-actions-side">
+                                                <button class="enc-btn-edit-icon" onclick="openEncEditForm(this)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                                                <span class="enc-preset-check">✓</span>
+                                            </div>
+                                        </div>
+                                        <div class="enc-preset-edit-form">
+                                            <input type="text" class="enc-preset-input-title" value="冷峻克制" placeholder="Preset Name">
+                                            <textarea class="enc-preset-textarea">语言简练，带着不易察觉的温柔。多用动作描写代替直接的情感表达，喜欢使用暗喻。</textarea>
+                                            <div class="enc-form-actions">
+                                                <button class="enc-btn-form-action danger" onclick="deleteEncPreset(this)">Delete</button>
+                                                <div class="enc-form-actions-right">
+                                                    <button class="enc-btn-form-action" onclick="cancelEncEdit(this)">Cancel</button>
+                                                    <button class="enc-btn-form-action primary" onclick="saveEncEdit(this)">Save</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="enc-preset-add-area">
+                                    <button class="enc-btn-add-preset" onclick="addEncNewPreset(this)">+ Add New Entry</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="enc-persona-item-group">
+                        <div class="enc-persona-item-header" onclick="toggleEncPersonaGroup(this)">
+                            <span class="enc-persona-item-title">Dynamics <i>(关系动态)</i></span>
+                            <span class="enc-persona-item-icon">+</span>
+                        </div>
+                        <div class="enc-persona-item-body-wrapper">
+                            <div class="enc-persona-item-body">
+                                <div class="enc-preset-list">
+                                    <div class="enc-preset-block">
+                                        <div class="enc-preset-view">
+                                            <div class="enc-preset-info" onclick="toggleEncPreset(this)">
+                                                <div class="enc-preset-name">隐秘的张力</div>
+                                                <div class="enc-preset-text">表面上是严厉的上下级，但私下里有着不可告人的默契。</div>
+                                            </div>
+                                            <div class="enc-preset-actions-side">
+                                                <button class="enc-btn-edit-icon" onclick="openEncEditForm(this)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                                                <span class="enc-preset-check">✓</span>
+                                            </div>
+                                        </div>
+                                        <div class="enc-preset-edit-form">
+                                            <input type="text" class="enc-preset-input-title" value="隐秘的张力">
+                                            <textarea class="enc-preset-textarea">表面上是严厉的上下级，但私下里有着不可告人的默契。</textarea>
+                                            <div class="enc-form-actions">
+                                                <button class="enc-btn-form-action danger" onclick="deleteEncPreset(this)">Delete</button>
+                                                <div class="enc-form-actions-right">
+                                                    <button class="enc-btn-form-action" onclick="cancelEncEdit(this)">Cancel</button>
+                                                    <button class="enc-btn-form-action primary" onclick="saveEncEdit(this)">Save</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="enc-preset-add-area">
+                                    <button class="enc-btn-add-preset" onclick="addEncNewPreset(this)">+ Add New Entry</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="enc-persona-item-group">
+                        <div class="enc-persona-item-header" onclick="toggleEncPersonaGroup(this)">
+                            <span class="enc-persona-item-title">Custom Lore <i>(专属设定)</i></span>
+                            <span class="enc-persona-item-icon">+</span>
+                        </div>
+                        <div class="enc-persona-item-body-wrapper">
+                            <div class="enc-persona-item-body">
+                                <div class="enc-preset-list"></div>
+                                <div class="enc-preset-add-area">
+                                    <button class="enc-btn-add-preset" onclick="addEncNewPreset(this)">+ Add New Entry</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="enc-persona-item-group">
+                        <div class="enc-persona-item-header" onclick="toggleEncPersonaGroup(this)">
+                            <span class="enc-persona-item-title">Restrictions <i>(禁忌事项)</i></span>
+                            <span class="enc-persona-item-icon">+</span>
+                        </div>
+                        <div class="enc-persona-item-body-wrapper">
+                            <div class="enc-persona-item-body">
+                                <div class="enc-preset-list"></div>
+                                <div class="enc-preset-add-area">
+                                    <button class="enc-btn-add-preset" onclick="addEncNewPreset(this)">+ Add New Entry</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="enc-persona-footer">
+                    <button class="enc-btn-persona-save" onclick="toggleEncPersonaPanel()">Apply Protocol</button>
+                </div>
+            </div>
+
+            <!-- 设置面板 -->
+            <div class="enc-settings-overlay" id="enc-settings-overlay" onclick="closeEncSettings(event)">
+                <div class="enc-settings-panel" onclick="event.stopPropagation()">
+                    <div class="enc-set-top-bar"></div>
+                    <div class="enc-set-drag-handle"></div>
+                    <div class="enc-set-header">
+                        <div>
+                            <div class="enc-set-title">Settings</div>
+                            <div class="enc-set-title-sub">System Configuration</div>
+                        </div>
+                        <button class="enc-btn-close-set" onclick="toggleEncSettings()">×</button>
+                    </div>
+                    <div class="enc-set-content">
+                        <div class="enc-set-item">
+                            <div><span class="enc-set-label">Perspective</span><span class="enc-set-desc">Story narration viewpoint</span></div>
+                            <div class="enc-set-btngroup">
+                                <button class="enc-set-btn">1ST</button>
+                                <button class="enc-set-btn active">2ND</button>
+                                <button class="enc-set-btn">3RD</button>
+                            </div>
+                        </div>
+                        <div class="enc-set-item">
+                            <div><span class="enc-set-label">Word Limit</span><span class="enc-set-desc">Max words per response</span></div>
+                            <div class="enc-set-input-wrap"><input type="number" class="enc-set-input" placeholder="500" value="500" onchange="saveEncSettings()"></div>
+                        </div>
+                        <div class="enc-set-item">
+                            <div><span class="enc-set-label">Auto Invoke</span><span class="enc-set-desc">Auto call AI after sending</span></div>
+                            <div class="enc-set-toggle" id="enc-auto-invoke-toggle" onclick="this.classList.toggle('active'); saveEncSettings()"></div>
+                        </div>
+                        <div class="enc-set-footer">
+                            <div class="enc-set-footer-diamond"></div>
+                            <div class="enc-set-footer-text">Studio Zero · Encounter</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 设置悬浮按钮 -->
+            <button class="enc-fab-settings enc-fab-watermark" id="enc-fab-settings" onclick="handleEncFabClick(event)">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             </button>
+
+            <!-- 选择界面 -->
+            <div class="enc-screen" id="enc-selection-screen">
+                <div class="enc-dir-header">
+                    <div class="enc-dir-masthead">
+                        <div class="enc-dir-masthead-left">
+                            <button class="enc-home-back" onclick="closeEncounter()">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#1e1b17" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                            </button>
+                            <div class="enc-dir-masthead-dot"></div>
+                            <div class="enc-dir-masthead-label">Studio Zero</div>
+                        </div>
+                        <div class="enc-dir-masthead-right">
+                            <div class="enc-dir-masthead-barcode"></div>
+                            <div class="enc-dir-masthead-issue">VOL.01</div>
+                        </div>
+                    </div>
+                    <div class="enc-dir-kicker">System · Offline Mode</div>
+                    <div class="enc-dir-title">The <i>Encounter.</i></div>
+                    <div class="enc-dir-subtitle">Swipe to browse · Tap to flip</div>
+                </div>
+
+                <div class="enc-dir-list" id="enc-dir-list"></div>
+
+                <div class="enc-dir-footer">
+                    <div class="enc-dir-footer-text">Studio Zero · Encounter</div>
+                    <div class="enc-dir-footer-line"></div>
+                </div>
+            </div>
+
+            <!-- 小说阅读界面 -->
+            <div class="enc-screen enc-hidden" id="enc-story-screen">
+                <div class="enc-intimate-vignette" id="enc-intimate-vignette"></div>
+                <div class="enc-heart-container" id="enc-heart-container"></div>
+                <div class="enc-story-watermark" id="enc-story-watermark">A</div>
+
+                <div class="enc-story-header-glass">
+                    <button class="enc-btn-back-glass" onclick="exitEncStory()"></button>
+                    <div class="enc-story-header-center">
+                        <div class="enc-avatar-glow">
+                            <div class="enc-story-hero-avatar-large" onclick="toggleEncPersonaPanel()" title="Persona Settings">
+                                <img src="" id="enc-story-hero-img" alt="Hero">
+                            </div>
+                        </div>
+                        <div class="enc-story-name-capsule" id="enc-story-target-name">Target</div>
+                    </div>
+                    <button class="enc-btn-intimate-glass" onclick="toggleEncIntimateMode()" title="Intimate Mode">
+                        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                    </button>
+                </div>
+
+                <div class="enc-story-content" id="enc-story-content">
+                    <div class="enc-chapter-title">
+                        <div class="enc-chapter-corner tl">❦</div>
+                        <div class="enc-chapter-corner tr">❦</div>
+                        <div class="enc-chapter-corner bl">❦</div>
+                        <div class="enc-chapter-corner br">❦</div>
+                        <h1>Chapter I</h1>
+                        <p id="enc-story-location">LOC: Unknown</p>
+                    </div>
+                    <div class="enc-prose" id="enc-prose-container"></div>
+                </div>
+
+                <div class="enc-story-input-area">
+                    <div class="enc-quick-menu-panel" id="enc-quick-menu-panel">
+                        <div class="enc-qm-header">
+                            <div class="enc-qm-title">Prompt</div>
+                            <div class="enc-qm-tag">Quick</div>
+                        </div>
+                        <div class="enc-qm-field">
+                            <div class="enc-qm-label"><span class="enc-qm-label-icon">◎</span> Scene</div>
+                            <input type="text" class="enc-qm-input" id="enc-qm-scene" placeholder="e.g. 下雨的咖啡厅...">
+                        </div>
+                        <div class="enc-qm-field">
+                            <div class="enc-qm-label"><span class="enc-qm-label-icon">♡</span> Mood</div>
+                            <input type="text" class="enc-qm-input" id="enc-qm-mood" placeholder="e.g. 暧昧、紧张...">
+                        </div>
+                        <div class="enc-qm-field">
+                            <div class="enc-qm-label"><span class="enc-qm-label-icon">✦</span> Instruction</div>
+                            <textarea class="enc-qm-input" id="enc-qm-instruction" placeholder="e.g. 让他主动靠近..."></textarea>
+                        </div>
+                        <button class="enc-qm-apply" onclick="applyEncQuickMenu()">Apply & Invoke AI ✦</button>
+                    </div>
+
+                    <div class="enc-intimate-meter-container">
+                        <span class="enc-meter-label">Sensory</span>
+                        <div class="enc-meter-slider-wrapper">
+                            <input type="range" class="enc-meter-slider" id="enc-climax-slider" min="0" max="100" value="0">
+                        </div>
+                        <span class="enc-meter-value" id="enc-climax-value">0%</span>
+                    </div>
+
+                    <div class="enc-input-toolbar">
+                        <div class="enc-toolbar-group">
+                            <button class="enc-toolbar-btn enc-btn-quick-menu" id="enc-btn-quick-menu" onclick="toggleEncQuickMenu()" title="Prompt Menu">
+                                <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                            </button>
+                            <button class="enc-toolbar-btn enc-btn-dark-toggle" onclick="toggleEncDarkMode()" title="Dark Mode">
+                                <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                            </button>
+                        </div>
+                        <button class="enc-toolbar-btn enc-btn-ai-invoke" onclick="invokeEncAI()" title="AI Continue">
+                            <svg viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                        </button>
+                    </div>
+
+                    <div class="enc-input-row">
+                        <div class="enc-input-box">
+                            <textarea id="enc-user-input" placeholder="Write your response..." rows="1" oninput="this.style.height='';this.style.height=this.scrollHeight+'px'"></textarea>
+                            <button class="enc-btn-send" onclick="sendEncAction()">Send</button>
+                        </div>
+                    </div>
+                    <div class="enc-input-hint"><span>Enter → Send</span><span>·</span><span>Shift+Enter → New line</span></div>
+                </div>
+            </div>
         </div>
 
         <!-- ================= 4. 世界书 App (Archive) ================= -->
@@ -769,6 +1363,10 @@
                 <svg viewBox="0 0 24 24" stroke="#fff" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </button>
         </div>
+
+    <!-- ================= 6. 堆叠通知栏与小窗遮罩 ================= -->
+    <div class="hc-noti-stack" id="hcNotiStack"></div>
+    <div class="hc-mini-overlay" id="hcMiniOverlay" onclick="closeHcMiniChat()"></div>
 
     <!-- 引入古典衬线字体 -->
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
@@ -887,5 +1485,7 @@
     <script src="js/wechat.js"></script>
     <script src="js/worldbook.js"></script>
     <script src="js/cognition.js"></script>
+    <script src="js/notification.js"></script>
+    <script src="js/encounter.js"></script>
 </body>
 </html>
