@@ -274,22 +274,13 @@
     font-weight: 500;
     letter-spacing: 0.5px;
 }
-.wc-chat-msg { 
-    font-size: 12px; 
-    color: #999; 
-    white-space: nowrap; 
-    overflow: hidden; 
-    text-overflow: ellipsis; 
-    max-width: 180px; 
-    line-height: 1.4;
+.wc-chat-msg {
+    font-size: 12px;
+    color: #888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-: rotate(-3deg); }
-.wc-avatar-img { position: absolute; width: 50px; height: 50px; top: 3px; left: 3px; background-color: #f8f8f8; display: flex; justify-content: center; align-items: center; font-size: 22px; color:#333; transform: rotate(-3deg); overflow: hidden; }
-.wc-chat-info { flex: 1; display: flex; flex-direction: column; justify-content: center; z-index: 2; }
-.wc-chat-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
-.wc-chat-name { font-size: 15px; font-weight: 600; color: #000; }
-.wc-chat-time { font-size: 10px; color: #bbb; }
-.wc-chat-msg { font-size: 12px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
 
 /* ================= 视图 2：通讯录界面 (AI 人物列表优化) ================= */
 .wc-contacts-header { padding: 10px 25px; font-family: "Georgia", serif; font-size: 26px; font-style: italic; font-weight: 800; color:#000;}
@@ -552,35 +543,59 @@
 }
 .wc-chat-view.active { display: flex; opacity: 1; transform: translateX(0); }
 
-/* 顶部导航 */
-.wc-chat-nav {
-    height: 90px; flex-shrink: 0; position: relative; z-index: 10;
-    background: linear-gradient(to bottom, #fcfbf8 80%, transparent);
-    padding: 0 20px;
+/* 顶部导航 (高定杂志风) */
+.haute-nav {
+    position: relative; height: 110px; flex-shrink: 0; z-index: 10;
+    background: linear-gradient(to bottom, rgba(252, 251, 248, 0.95) 60%, rgba(252, 251, 248, 0));
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    padding: 0 24px; display: flex; flex-direction: column; overflow: hidden;
 }
-.wc-chat-nav-status {
+.haute-nav::after {
+    content: ''; position: absolute; bottom: 0; left: 24px; right: 24px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,0,0,0.08) 20%, rgba(0,0,0,0.08) 80%, transparent);
+}
+.haute-watermark {
+    position: absolute; top: -10px; right: -10px;
+    font-family: "Cormorant Garamond", serif; font-size: 120px; font-weight: 700;
+    font-style: italic; color: rgba(0,0,0,0.02); line-height: 1; pointer-events: none; z-index: 0;
+}
+.haute-status-bar {
     height: 44px; display: flex; justify-content: space-between; align-items: center;
-    font-size: 14px; font-weight: 600; color: #000;
+    font-size: 14px; font-weight: 600; color: #111; z-index: 2;
 }
-.wc-chat-nav-bar { display: flex; align-items: center; gap: 12px; height: 46px; }
-.wc-chat-back-btn {
-    width: 32px; height: 32px; border-radius: 10px; background: rgba(0,0,0,0.05);
-    display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s;
+.haute-main { flex: 1; display: flex; align-items: center; justify-content: space-between; z-index: 2; padding-bottom: 10px; }
+.haute-left { display: flex; align-items: center; gap: 12px; }
+.haute-back-btn {
+    width: 36px; height: 36px; border: none; border-radius: 50%;
+    background: #111; color: #fff; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
-.wc-chat-back-btn:active { transform: scale(0.9); background: rgba(0,0,0,0.1); }
-.wc-chat-contact-avatar {
-    width: 36px; height: 36px; border-radius: 12px; overflow: hidden;
-    background: #eee; display: flex; justify-content: center; align-items: center;
-    font-size: 18px; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.06);
+.haute-back-btn:active { background: #333; transform: scale(0.9); }
+.haute-back-btn svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 1.5; fill: none; transition: 0.3s; }
+.haute-vol {
+    font-family: "Space Mono", monospace; font-size: 8px; font-weight: 700; color: #999;
+    letter-spacing: 2px; writing-mode: vertical-rl; transform: rotate(180deg); text-transform: uppercase;
 }
-.wc-chat-contact-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.wc-chat-contact-info { flex: 1; }
-.wc-chat-contact-name { font-size: 15px; font-weight: 700; color: #111; }
-.wc-chat-contact-status { font-size: 10px; color: #aaa; letter-spacing: 0.5px; }
-.wc-chat-more-btn {
-    width: 32px; height: 32px; border-radius: 10px; background: rgba(0,0,0,0.05);
-    display: flex; justify-content: center; align-items: center; cursor: pointer;
+.haute-center { display: flex; flex-direction: column; align-items: center; position: absolute; left: 50%; transform: translateX(-50%); }
+.haute-name { font-family: "Cormorant Garamond", serif; font-size: 22px; font-weight: 700; font-style: italic; color: #111; letter-spacing: 0.5px; line-height: 1.1; }
+.haute-meta { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+.haute-dot { width: 4px; height: 4px; background: #111; border-radius: 50%; animation: hautePulse 2s infinite; }
+.haute-meta span { font-family: "Space Mono", monospace; font-size: 8px; color: #888; letter-spacing: 1.5px; text-transform: uppercase; }
+.haute-right { display: flex; align-items: center; gap: 14px; }
+.haute-avatar-wrap { position: relative; width: 38px; height: 38px; display: flex; justify-content: center; align-items: center; }
+.haute-avatar-inner { width: 30px; height: 30px; border-radius: 50%; overflow: hidden; z-index: 2; background: #eee; display: flex; justify-content: center; align-items: center; font-size: 15px; }
+.haute-avatar-inner img { width: 100%; height: 100%; object-fit: cover; }
+.haute-avatar-ring {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    border: 1px dashed rgba(0,0,0,0.2); border-radius: 50%; animation: hauteSpin 20s linear infinite; z-index: 1;
 }
+.haute-menu-btn { display: flex; flex-direction: column; gap: 4px; background: none; border: none; cursor: pointer; padding: 5px; }
+.haute-menu-btn span { display: block; width: 16px; height: 1px; background: #111; transition: 0.2s; }
+.haute-menu-btn span:nth-child(2) { width: 10px; align-self: flex-end; }
+.haute-menu-btn:active span:nth-child(2) { width: 16px; }
+
+@keyframes hautePulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.8); } }
+@keyframes hauteSpin { 100% { transform: rotate(360deg); } }
 
 /* 消息区域 */
 .wc-chat-messages {
@@ -653,13 +668,83 @@
 
 .wc-bubble-bot {
     background: #FFFFFF; color: #1C1C1E; 
-    border-radius: 20px; /* 恢复全圆角 */
-    padding: 8px 14px; /* 纵向缩短内边距 */
+    border-radius: 20px;
+    padding: 8px 14px;
     border: 1.5px solid rgba(0,0,0,0.08);
-    font-size: 12.5px; line-height: 1.35; /* 稍微缩短行高，更紧凑 */
+    font-size: 12.5px; line-height: 1.35;
     transform-origin: left bottom;
     will-change: transform, opacity;
     animation: wcSilkyPopIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    position: relative;
+}
+
+/* 气泡风格 A：左侧竖线 */
+.bubble-style-a .wc-bubble-bot {
+    border-left: 3px solid #111;
+    border-radius: 4px 20px 20px 20px;
+    padding-left: 12px;
+}
+
+/* 气泡风格 B：左上直角 + 底部线 */
+.bubble-style-b .wc-bubble-bot {
+    border-radius: 4px 20px 20px 20px;
+}
+.bubble-style-b .wc-bubble-bot::after {
+    content: '';
+    position: absolute; bottom: 0; left: 12px; right: 12px; height: 1px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.08), transparent);
+}
+
+/* 气泡风格 C：顶部渐变条 */
+.bubble-style-c .wc-bubble-bot {
+    padding-top: 14px;
+    border-radius: 4px 20px 20px 20px;
+}
+.bubble-style-c .wc-bubble-bot::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, #111 0%, #111 20%, #888 20%, #888 40%, #ddd 40%, #ddd 100%);
+    border-radius: 4px 20px 0 0;
+}
+
+/* 气泡风格 D：渐变竖条 + 阴影 */
+.bubble-style-d .wc-bubble-bot {
+    border: none;
+    border-radius: 4px 20px 20px 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.04);
+    padding-left: 16px;
+}
+.bubble-style-d .wc-bubble-bot::before {
+    content: '';
+    position: absolute; top: 6px; bottom: 6px; left: 0; width: 3px;
+    background: linear-gradient(to bottom, #111, #bbb);
+    border-radius: 0 2px 2px 0;
+}
+
+/* 气泡风格 E：邮票标签 */
+.bubble-style-e .wc-bubble-bot {
+    border: 1.5px solid rgba(0,0,0,0.1);
+    border-radius: 4px 20px 20px 20px;
+    padding-top: 14px;
+}
+.bubble-style-e .wc-bubble-bot::before {
+    content: 'AI';
+    position: absolute; top: -8px; left: 10px;
+    font-family: "Space Mono", monospace; font-size: 7px; font-weight: 700;
+    color: #fff; background: #111; padding: 2px 6px; letter-spacing: 1px;
+}
+
+/* 气泡风格 F：纸张折角 */
+.bubble-style-f .wc-bubble-bot {
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 4px 20px 20px 20px;
+    background: linear-gradient(145deg, #ffffff 0%, #faf9f6 100%);
+    box-shadow: 2px 3px 0px rgba(0,0,0,0.03);
+}
+.bubble-style-f .wc-bubble-bot::before {
+    content: '';
+    position: absolute; top: 0; left: 0; width: 12px; height: 12px;
+    background: linear-gradient(135deg, #f5f4f1 50%, rgba(0,0,0,0.06) 50%);
 }
 .wc-bubble-action {
     display: flex; gap: 12px; margin-top: 4px; padding-left: 2px;
@@ -690,9 +775,143 @@
 .wc-extra-btn {
     width: 28px; height: 28px; border-radius: 50%; background: rgba(0,0,0,0.04); 
     display: flex; justify-content: center; align-items: center; 
-    cursor: pointer; transition: all 0.2s; border: none;
+    cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); border: none;
+    color: #999;
 }
 .wc-extra-btn:active { transform: scale(0.88); background: rgba(0,0,0,0.08); }
+
+.wc-plus-menu {
+    position: absolute;
+    bottom: 105px; left: 14px; right: 14px;
+    background: 
+        radial-gradient(circle at -10% 110%, rgba(17, 17, 17, 0.4) 0%, rgba(17, 17, 17, 0.08) 45%, transparent 75%),
+        rgba(252, 251, 248, 0.85);
+    backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.9);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,1);
+    padding: 16px; 
+    opacity: 0; transform: translateY(20px) scale(0.96);
+    pointer-events: none; transform-origin: bottom center;
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    z-index: 100; overflow: hidden;
+}
+
+.wc-plus-menu.active {
+    opacity: 1; transform: translateY(0) scale(1); pointer-events: auto;
+}
+
+.wc-plus-bg-svg {
+    position: absolute; right: -50px; top: -50px; width: 250px; height: 250px;
+    stroke: rgba(0,0,0,0.04); fill: none; stroke-width: 1; pointer-events: none; z-index: 0;
+    animation: spinSlow 40s linear infinite;
+}
+@keyframes spinSlow { 100% { transform: rotate(360deg); } }
+
+.wc-menu-cropmark { position: absolute; width: 16px; height: 16px; pointer-events: none; z-index: 1; }
+.wc-menu-cropmark svg { width: 100%; height: 100%; stroke: rgba(0,0,0,0.2); fill: none; stroke-width: 1.5; }
+.crop-tl { top: 12px; left: 12px; }
+.crop-tr { top: 12px; right: 12px; transform: rotate(90deg); }
+.crop-bl { bottom: 12px; left: 12px; transform: rotate(-90deg); }
+.crop-br { bottom: 12px; right: 12px; transform: rotate(180deg); }
+
+.wc-plus-topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px; padding: 0 4px; position: relative; z-index: 2;
+}
+.wc-plus-topbar-title {
+    font-family: "Space Mono", monospace; font-size: 9px; font-weight: 700;
+    color: #111; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;
+}
+.wc-plus-topbar-title::before { content: ''; display: block; width: 6px; height: 6px; background: #111; }
+.wc-plus-barcode-group { display: flex; align-items: center; gap: 8px; }
+.wc-plus-syscode { font-family: "Space Mono", monospace; font-size: 8px; color: #888; letter-spacing: 1px; }
+.wc-plus-barcode {
+    height: 10px; width: 30px;
+    background: repeating-linear-gradient(to right, #111 0px, #111 1.5px, transparent 1.5px, transparent 3px, #111 3px, #111 4px, transparent 4px, transparent 6px);
+    opacity: 0.4;
+}
+
+.wc-bento-grid {
+    display: grid; grid-template-columns: repeat(6, 1fr); grid-auto-rows: 64px; 
+    gap: 8px; position: relative; z-index: 2;
+}
+
+.wc-bento-item {
+    border-radius: 14px; position: relative; overflow: hidden; cursor: pointer;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 10px; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.wc-bento-item:active { transform: scale(0.94); }
+
+.wc-bento-item::after {
+    position: absolute; bottom: -12px; right: -4px;
+    font-family: "Cormorant Garamond", serif; font-size: 70px; font-weight: 700; font-style: italic;
+    line-height: 1; pointer-events: none; z-index: 0; transition: transform 0.4s ease;
+}
+.wc-bento-item:hover::after { transform: scale(1.05) translateX(-2px); }
+.bento-1::after { content: '01'; color: rgba(255, 255, 255, 0.05); }
+.bento-2::after { content: '02'; color: rgba(0, 0, 0, 0.03); }
+.bento-3::after { content: '03'; color: rgba(0, 0, 0, 0.03); }
+.bento-4::after { content: '04'; color: rgba(0, 0, 0, 0.03); }
+
+.wc-bento-num { font-family: "Space Mono", monospace; font-size: 9px; position: absolute; top: 10px; left: 10px; z-index: 2; }
+.wc-bento-title {
+    font-family: "Cormorant Garamond", serif; font-size: 16px; font-weight: 700;
+    position: absolute; bottom: 8px; left: 10px; z-index: 2;
+    transition: transform 0.3s ease; display: flex; align-items: baseline; gap: 4px;
+}
+.wc-bento-title span { font-family: -apple-system, sans-serif; font-size: 8px; font-weight: 400; letter-spacing: 0; }
+.wc-bento-item:hover .wc-bento-title { transform: translateX(3px); }
+
+.wc-bento-icon {
+    position: absolute; top: 10px; right: 10px; z-index: 2;
+    width: 16px; height: 16px; fill: none; stroke-width: 1.5; transition: transform 0.3s ease;
+}
+.wc-bento-item:hover .wc-bento-icon { transform: scale(1.1) rotate(-5deg); }
+
+.wc-bento-deco { position: absolute; pointer-events: none; z-index: 1; }
+
+.bento-1 { 
+    grid-column: span 3; background: #111; color: #fff; 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15); border: 1px solid #333;
+}
+.bento-1 .wc-bento-num { color: #888; }
+.bento-1 .wc-bento-title span { color: #888; }
+.bento-1 .wc-bento-icon { stroke: #fff; }
+.bento-1 .wc-bento-deco { right: 0; bottom: 0; width: 100%; height: 100%; stroke: rgba(255,255,255,0.08); stroke-width: 1; fill: none; }
+
+.bento-white { background: rgba(255, 255, 255, 0.95); color: #111; border: 1px solid rgba(0,0,0,0.06); box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+.bento-white:active { background: #f0f0f0; }
+.bento-white .wc-bento-num { color: #aaa; }
+.bento-white .wc-bento-title span { color: #999; }
+.bento-white .wc-bento-icon { stroke: #111; }
+.bento-white .wc-bento-deco { stroke: rgba(0,0,0,0.04); fill: none; stroke-width: 1; }
+
+.bento-2 { grid-column: span 3; }
+.bento-2 .wc-bento-deco { left: 0; top: 0; width: 100%; height: 100%; background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0, rgba(0,0,0,0.03) 1px, transparent 1px, transparent 6px); }
+.bento-3 { grid-column: span 2; }
+.bento-4 { grid-column: span 2; }
+
+.bento-empty {
+    grid-column: span 1; background: transparent; border: 1px dashed rgba(0,0,0,0.15); border-radius: 14px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; cursor: default;
+}
+.bento-empty:active { transform: none; background: rgba(0,0,0,0.02); }
+.bento-empty svg { width: 14px; height: 14px; stroke: rgba(0,0,0,0.2); stroke-width: 1.5; }
+.bento-empty-text { position: absolute; bottom: 6px; font-family: "Space Mono", monospace; font-size: 7px; color: rgba(0,0,0,0.2); letter-spacing: 1px; }
+
+.wc-plus-menu.active .wc-plus-topbar { animation: menuPopIn 0.4s 0.05s both cubic-bezier(0.16, 1, 0.3, 1); }
+.wc-plus-menu.active .bento-1 { animation: menuPopIn 0.4s 0.1s both cubic-bezier(0.16, 1, 0.3, 1); }
+.wc-plus-menu.active .bento-2 { animation: menuPopIn 0.4s 0.15s both cubic-bezier(0.16, 1, 0.3, 1); }
+.wc-plus-menu.active .bento-3 { animation: menuPopIn 0.4s 0.2s both cubic-bezier(0.16, 1, 0.3, 1); }
+.wc-plus-menu.active .bento-4 { animation: menuPopIn 0.4s 0.25s both cubic-bezier(0.16, 1, 0.3, 1); }
+.wc-plus-menu.active .bento-empty { animation: menuPopIn 0.4s 0.3s both cubic-bezier(0.16, 1, 0.3, 1); }
+
+@keyframes menuPopIn {
+    0% { opacity: 0; transform: translateY(10px) scale(0.98); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
 
 /* 胶囊发送组 */
 .wc-send-group {
@@ -745,150 +964,478 @@
 /* ================= 聊天室设置界面 ================= */
 .wc-chat-settings {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: #fcfbf8; z-index: 160;
+    background: #f5f4f1; z-index: 160;
     display: none; flex-direction: column;
     opacity: 0; transform: translateX(100%);
     transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
-    background-image: 
-        linear-gradient(rgba(0,0,0,0.018) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,0,0,0.018) 1px, transparent 1px);
-    background-size: 24px 24px;
 }
 .wc-chat-settings.active { display: flex; opacity: 1; transform: translateX(0); }
 
-.wc-cs-nav {
-    height: 60px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
-    position: relative; z-index: 10; margin-top: 20px;
+.cs-nav {
+    height: 50px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
+    margin-top: 50px; flex-shrink: 0; position: relative; z-index: 10;
 }
-.wc-cs-back-btn {
-    width: 36px; height: 36px; border-radius: 12px; background: #fff;
-    border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-    display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s;
+.cs-back {
+    width: 34px; height: 34px; border-radius: 50%; background: #111;
+    border: none; display: flex; justify-content: center; align-items: center; cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15); transition: 0.2s;
 }
-.wc-cs-back-btn:active { transform: scale(0.9); }
-.wc-cs-nav-title { font-family: "Cormorant Garamond", "Georgia", serif; font-size: 20px; font-weight: 700; font-style: italic; }
-.wc-cs-save-btn {
-    font-size: 13px; font-weight: 700; color: #111; cursor: pointer;
-    background: none; border: none; padding: 0; letter-spacing: 1px; text-transform: uppercase;
+.cs-back:active { transform: scale(0.9); }
+.cs-back svg { width: 15px; height: 15px; }
+.cs-title-center {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    font-family: "Space Mono", monospace; font-size: 9px; font-weight: 700;
+    color: #aaa; letter-spacing: 3px; text-transform: uppercase;
 }
-.wc-cs-save-btn:active { opacity: 0.5; }
+.cs-save {
+    font-size: 11px; font-weight: 700; color: #111; cursor: pointer;
+    background: none; border: 1px solid #111; padding: 7px 16px;
+    letter-spacing: 1px; text-transform: uppercase; transition: 0.2s;
+}
+.cs-save:active { background: #111; color: #fff; }
 
-.wc-cs-content { flex: 1; overflow-y: auto; padding: 10px 20px 40px; position: relative; z-index: 1; }
-.wc-cs-content::-webkit-scrollbar { display: none; }
+.cs-scroll {
+    flex: 1; overflow-y: auto; padding: 0 0 80px; scroll-behavior: smooth;
+}
+.cs-scroll::-webkit-scrollbar { display: none; }
 
-/* 背景十字标 */
-.wc-cs-cross { position: absolute; width: 10px; height: 10px; pointer-events: none; }
-.wc-cs-cross::before, .wc-cs-cross::after { content: ''; position: absolute; background: rgba(0,0,0,0.12); }
-.wc-cs-cross::before { top: 4px; left: 0; width: 10px; height: 1px; }
-.wc-cs-cross::after { top: 0; left: 4px; width: 1px; height: 10px; }
-
-/* 背景 SVG 星星 */
-.wc-cs-bg-star { position: absolute; pointer-events: none; z-index: 0; }
-
-/* 双人羁绊区 */
-.wc-cs-dual-hero {
-    display: flex; align-items: center; justify-content: space-between;
-    background: linear-gradient(145deg, #ffffff, #f5f4f1);
-    border-radius: 28px; padding: 30px 20px 28px; margin-bottom: 28px;
-    border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-    position: relative; overflow: hidden;
+.cs-stamp-hero {
+    margin: 20px 20px 0; padding: 28px 20px 24px;
+    background: #fff; border: 1px solid #e0e0e0; position: relative;
+    background-image:
+        radial-gradient(circle, #f5f4f1 4px, transparent 4px),
+        radial-gradient(circle, #f5f4f1 4px, transparent 4px),
+        radial-gradient(circle, #f5f4f1 4px, transparent 4px),
+        radial-gradient(circle, #f5f4f1 4px, transparent 4px);
+    background-size: 16px 16px;
+    background-position: top left, top right, bottom left, bottom right;
+    background-repeat: repeat-x, repeat-x, repeat-x, repeat-x;
 }
-.wc-cs-dual-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.06; }
-.wc-cs-dual-link {
-    position: absolute; top: 38%; left: 50%; transform: translate(-50%, -50%);
-    display: flex; flex-direction: column; align-items: center; z-index: 2;
+.cs-stamp-hero::before {
+    content: ''; position: absolute; top: -1px; left: 8px; right: 8px; height: 1px;
+    background: repeating-linear-gradient(90deg, #e0e0e0 0px, #e0e0e0 8px, transparent 8px, transparent 16px);
 }
-.wc-cs-olive { position: absolute; top: 50%; pointer-events: none; opacity: 0.12; }
-.wc-cs-olive-left { left: -65px; transform: translateY(-50%) scaleX(-1); }
-.wc-cs-olive-right { right: -65px; transform: translateY(-50%); }
-.wc-cs-link-star {
-    font-size: 14px; color: #111; z-index: 3; background: #f9f8f5; padding: 0 8px;
-    animation: starBreathe 3s infinite ease-in-out;
+.cs-stamp-hero::after {
+    content: ''; position: absolute; bottom: -1px; left: 8px; right: 8px; height: 1px;
+    background: repeating-linear-gradient(90deg, #e0e0e0 0px, #e0e0e0 8px, transparent 8px, transparent 16px);
 }
-.wc-cs-role-box { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 45%; position: relative; z-index: 1; }
-.wc-cs-role-label { font-size: 9px; color: #aaa; letter-spacing: 2px; text-transform: uppercase; }
-.wc-cs-avatar-circle {
-    width: 64px; height: 64px; border-radius: 22px; background: #fff;
-    border: 2px solid #eee; display: flex; justify-content: center; align-items: center;
-    font-size: 24px; overflow: hidden; cursor: pointer; transition: 0.2s;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05); position: relative;
+.cs-stamp-top {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
 }
-.wc-cs-avatar-circle:active { transform: scale(0.95); }
-.wc-cs-avatar-circle img { width: 100%; height: 100%; object-fit: cover; }
-.wc-cs-avatar-hint {
-    position: absolute; bottom: 4px; font-size: 8px; color: #fff;
-    background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 8px; backdrop-filter: blur(4px);
+.cs-stamp-label {
+    font-family: "Space Mono", monospace; font-size: 7px; color: #bbb;
+    letter-spacing: 2px; text-transform: uppercase;
 }
-.wc-cs-name-input {
+.cs-stamp-barcode {
+    height: 12px; width: 50px;
+    background: repeating-linear-gradient(90deg, #111 0px, #111 2px, transparent 2px, transparent 4px, #111 4px, #111 5px, transparent 5px, transparent 7px);
+    opacity: 0.15;
+}
+.cs-duo-row { display: flex; align-items: center; justify-content: center; gap: 0; }
+.cs-person { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 110px; }
+.cs-person-tag {
+    font-family: "Space Mono", monospace; font-size: 7px; color: #aaa;
+    letter-spacing: 2px; text-transform: uppercase; background: #f5f4f1; padding: 2px 8px;
+}
+.cs-avatar-frame { width: 68px; height: 68px; position: relative; cursor: pointer; }
+.cs-avatar-outer { position: absolute; inset: 0; border: 1px solid #ddd; transform: rotate(3deg); }
+.cs-avatar-inner {
+    position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px;
+    border-radius: 50%; background: #f0f0f0; overflow: hidden;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 24px; border: 2px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+.cs-avatar-inner img { width: 100%; height: 100%; object-fit: cover; }
+.cs-avatar-edit {
+    position: absolute; bottom: -2px; right: -2px;
+    width: 18px; height: 18px; background: #111; border-radius: 50%;
+    display: flex; justify-content: center; align-items: center;
+    border: 2px solid #fff; z-index: 2;
+}
+.cs-avatar-edit svg { width: 8px; height: 8px; stroke: #fff; fill: none; stroke-width: 2.5; }
+.cs-name-input {
     width: 100%; text-align: center; border: none; background: transparent;
-    font-family: "Cormorant Garamond", "Georgia", serif; font-size: 18px; font-weight: 700;
-    color: #111; outline: none; border-bottom: 1px dashed transparent; padding-bottom: 2px; transition: 0.2s;
-    box-sizing: border-box;
+    font-family: "Cormorant Garamond", serif; font-size: 16px; font-weight: 700;
+    color: #111; outline: none; padding: 2px 0;
 }
-.wc-cs-name-input:focus { border-bottom: 1px dashed #ccc; }
+.cs-link-area {
+    display: flex; flex-direction: column; align-items: center; padding: 0 12px;
+    position: relative; height: 68px; justify-content: center;
+}
+.cs-link-wire { width: 50px; height: 1px; position: relative; }
+.cs-link-wire::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, #ddd, #999, #ddd);
+}
+.cs-link-diamond {
+    width: 12px; height: 12px; background: #111; transform: rotate(45deg);
+    margin: -6px 0; position: relative; z-index: 2;
+}
+.cs-link-diamond::after { content: ''; position: absolute; inset: 2px; background: #f5f4f1; }
 
-/* 票据卡片 */
-.wc-cs-ticket {
-    background: #fff; border-radius: 20px; padding: 24px 20px; margin-bottom: 24px;
-    position: relative; box-shadow: 0 8px 25px rgba(0,0,0,0.04); overflow: hidden;
-    background-image: radial-gradient(circle at 0 50%, transparent 6px, #fff 7px), radial-gradient(circle at 100% 50%, transparent 6px, #fff 7px);
-    background-size: 100% 100%; background-repeat: no-repeat;
+.cs-divider {
+    display: flex; align-items: center; gap: 0; margin: 28px 20px 14px; position: relative;
 }
-.wc-cs-ticket::before, .wc-cs-ticket::after {
-    content: ''; position: absolute; left: 20px; right: 20px; height: 1px;
-    background-image: linear-gradient(to right, #ddd 50%, transparent 50%); background-size: 8px 1px;
+.cs-divider-num {
+    font-family: "Cormorant Garamond", serif; font-size: 32px; font-weight: 300;
+    font-style: italic; color: #e0e0e0; line-height: 1; margin-right: 10px; min-width: 30px;
 }
-.wc-cs-ticket::before { top: 12px; }
-.wc-cs-ticket::after { bottom: 12px; }
-.wc-cs-ticket-title {
-    font-size: 10px; color: #888; letter-spacing: 2px; text-transform: uppercase;
-    margin-bottom: 16px; display: flex; align-items: center; gap: 8px; position: relative; z-index: 2;
+.cs-divider-tag {
+    font-family: "Space Mono", monospace; font-size: 8px; font-weight: 700;
+    color: #fff; background: #111; padding: 3px 10px; letter-spacing: 2px;
+    text-transform: uppercase; white-space: nowrap;
 }
-.wc-cs-ticket-title::before { content: ''; display: inline-block; width: 6px; height: 6px; background: #111; border-radius: 50%; }
-.wc-cs-svg-deco { position: absolute; pointer-events: none; }
-.wc-cs-stamp {
-    position: absolute; top: 15px; right: 20px; width: 40px; height: 40px;
-    border: 1.5px solid rgba(0,0,0,0.08); border-radius: 50%;
-    display: flex; justify-content: center; align-items: center; transform: rotate(15deg); pointer-events: none;
+.cs-divider-line { flex: 1; height: 1px; background: #ddd; margin-left: 10px; }
+.cs-divider-dot { width: 4px; height: 4px; background: #111; border-radius: 50%; margin-left: 8px; }
+
+.cs-ticket {
+    margin: 0 20px 16px; background: #111; padding: 0; cursor: pointer;
+    position: relative; overflow: hidden; transition: 0.2s; display: flex; align-items: stretch;
 }
-.wc-cs-stamp::before {
-    content: 'APPROVED'; font-size: 5px; color: rgba(0,0,0,0.12); letter-spacing: 1px; transform: rotate(-30deg);
+.cs-ticket:active { transform: scale(0.98); }
+.cs-ticket-left {
+    width: 50px; background: repeating-linear-gradient(0deg, #111 0px, #111 8px, #222 8px, #222 9px);
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    border-right: 1px dashed rgba(255,255,255,0.15); flex-shrink: 0;
 }
-.wc-cs-barcode {
-    position: absolute; bottom: 20px; right: 20px; height: 20px; width: 60px;
-    background: repeating-linear-gradient(to right, #111 0px, #111 2px, transparent 2px, transparent 4px, #111 4px, #111 5px, transparent 5px, transparent 8px);
-    opacity: 0.12; pointer-events: none;
+.cs-ticket-left span {
+    font-family: "Space Mono", monospace; font-size: 7px; color: rgba(255,255,255,0.3);
+    writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 2px;
 }
-.wc-cs-persona-textarea {
+.cs-ticket-body { flex: 1; padding: 22px 18px; position: relative; }
+.cs-ticket-body::after {
+    content: '✦'; position: absolute; top: 15px; right: 15px;
+    font-size: 20px; color: rgba(255,255,255,0.06);
+}
+.cs-ticket-kicker {
+    font-family: "Space Mono", monospace; font-size: 7px; color: rgba(255,255,255,0.35);
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px;
+}
+.cs-ticket-title {
+    font-family: "Cormorant Garamond", serif; font-size: 20px; font-weight: 700;
+    font-style: italic; color: #fff; margin-bottom: 3px;
+}
+.cs-ticket-sub {
+    font-family: "Space Mono", monospace; font-size: 8px; color: rgba(255,255,255,0.25); letter-spacing: 1px;
+}
+.cs-ticket-right {
+    width: 44px; display: flex; justify-content: center; align-items: center;
+    border-left: 1px dashed rgba(255,255,255,0.15); flex-shrink: 0;
+}
+.cs-ticket-right svg { width: 16px; height: 16px; stroke: rgba(255,255,255,0.5); fill: none; stroke-width: 2; }
+.cs-ticket::before, .cs-ticket::after {
+    content: ''; position: absolute; width: 16px; height: 16px;
+    background: #f5f4f1; border-radius: 50%; z-index: 2;
+}
+.cs-ticket::before { left: 42px; top: -8px; }
+.cs-ticket::after { left: 42px; bottom: -8px; }
+
+.cs-mask-board { margin: 0 20px 16px; position: relative; }
+.cs-mask-tape {
+    display: flex; gap: 10px; overflow-x: auto; padding: 8px 0 12px; scrollbar-width: none; position: relative;
+}
+.cs-mask-tape::-webkit-scrollbar { display: none; }
+.cs-mask-note {
+    flex-shrink: 0; width: 120px; padding: 14px 12px 12px;
+    background: #fff; position: relative; cursor: pointer;
+    border: 1px solid rgba(0,0,0,0.08);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: rotate(-1deg);
+}
+.cs-mask-note:nth-child(2n) { transform: rotate(1.5deg); }
+.cs-mask-note:nth-child(3n) { transform: rotate(-0.5deg); }
+.cs-mask-note:active { transform: scale(0.96) rotate(0deg); }
+.cs-mask-note.active {
+    background: #111; color: #fff; border-color: #111;
+    transform: rotate(0deg) translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+.cs-mask-note::before {
+    content: ''; position: absolute; top: -5px; left: 50%; transform: translateX(-50%);
+    width: 30px; height: 10px; background: rgba(200,195,185,0.6); border-radius: 0 0 2px 2px;
+}
+.cs-mask-note.active::before { background: rgba(255,255,255,0.2); }
+.cs-mask-note-num {
+    font-family: "Space Mono", monospace; font-size: 7px; color: #ccc;
+    letter-spacing: 1px; margin-bottom: 6px;
+}
+.cs-mask-note.active .cs-mask-note-num { color: rgba(255,255,255,0.4); }
+.cs-mask-note-name {
+    font-family: "Cormorant Garamond", serif; font-size: 15px; font-weight: 700;
+    color: #111; line-height: 1.2; margin-bottom: 4px;
+}
+.cs-mask-note.active .cs-mask-note-name { color: #fff; }
+.cs-mask-note-hint {
+    font-family: "Space Mono", monospace; font-size: 7px; color: #bbb;
+    letter-spacing: 0.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cs-mask-note.active .cs-mask-note-hint { color: rgba(255,255,255,0.35); }
+.cs-mask-add {
+    flex-shrink: 0; width: 60px; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; gap: 4px;
+    border: 1.5px dashed #ccc; padding: 14px 8px; cursor: pointer;
+    transition: 0.2s; background: transparent;
+}
+.cs-mask-add:active { border-color: #111; transform: scale(0.95); }
+.cs-mask-add svg { width: 16px; height: 16px; stroke: #bbb; fill: none; stroke-width: 2; }
+.cs-mask-add span { font-family: "Space Mono", monospace; font-size: 6px; color: #bbb; letter-spacing: 1px; text-transform: uppercase; }
+.cs-mask-textarea-wrap {
+    background: #fff; border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 0 0 16px 16px; padding: 16px; margin-top: -1px; position: relative;
+}
+.cs-mask-textarea-wrap::before {
+    content: ''; position: absolute; top: 0; left: 16px; right: 16px; height: 1px;
+    background: repeating-linear-gradient(90deg, #e8e8e8 0px, #e8e8e8 4px, transparent 4px, transparent 8px);
+}
+.cs-mask-textarea {
+    width: 100%; min-height: 55px; border: none; outline: none; resize: none;
+    font-family: "Cormorant Garamond", serif; font-size: 15px; font-style: italic;
+    line-height: 1.6; color: #333; background: transparent;
+}
+.cs-mask-textarea::placeholder { color: #ccc; }
+
+.cs-envelope {
+    margin: 0 20px 16px; background: #fff; position: relative; overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.06);
+}
+.cs-envelope-flap {
+    width: 100%; height: 50px; position: relative; overflow: hidden;
+    background: linear-gradient(135deg, #f5f4f1 49.5%, transparent 50%),
+                linear-gradient(225deg, #f5f4f1 49.5%, transparent 50%),
+                linear-gradient(to bottom, #e8e7e3, #f0efec);
+}
+.cs-envelope-flap-label {
+    position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+    font-family: "Space Mono", monospace; font-size: 7px; color: #bbb;
+    letter-spacing: 2px; text-transform: uppercase;
+}
+.cs-envelope-body { padding: 20px; }
+.cs-envelope-head {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
+}
+.cs-envelope-title { display: flex; align-items: center; gap: 8px; }
+.cs-envelope-icon { width: 20px; height: 20px; display: flex; justify-content: center; align-items: center; }
+.cs-envelope-icon svg { width: 14px; height: 14px; stroke: #111; fill: none; stroke-width: 1.5; }
+.cs-envelope-label {
+    font-family: "Space Mono", monospace; font-size: 9px; font-weight: 700;
+    color: #888; letter-spacing: 1.5px; text-transform: uppercase;
+}
+.cs-envelope-stamp {
+    width: 32px; height: 32px; border: 1.5px solid rgba(0,0,0,0.08);
+    display: flex; justify-content: center; align-items: center; transform: rotate(8deg);
+}
+.cs-envelope-stamp::before { content: '✦'; font-size: 12px; color: rgba(0,0,0,0.1); }
+.cs-envelope-textarea {
     width: 100%; min-height: 80px; border: none; outline: none; resize: none;
-    font-family: "Cormorant Garamond", "Georgia", serif; font-size: 16px; font-style: italic; line-height: 1.5; color: #111;
-    background: transparent; box-sizing: border-box; position: relative; z-index: 2;
+    font-family: "Cormorant Garamond", serif; font-size: 15px; font-style: italic;
+    line-height: 1.6; color: #333; background: transparent;
+    background-image: linear-gradient(transparent 23px, rgba(0,0,0,0.03) 24px);
+    background-size: 100% 24px;
 }
-.wc-cs-persona-textarea::placeholder { color: #ccc; }
+.cs-envelope-textarea::placeholder { color: #ccc; }
 
-.wc-cs-toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; position: relative; z-index: 2; }
-.wc-cs-toggle-info { display: flex; flex-direction: column; gap: 4px; }
-.wc-cs-toggle-title { font-size: 14px; font-weight: 600; color: #111; }
-.wc-cs-toggle-desc { font-size: 11px; color: #999; }
-.wc-cs-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
-.wc-cs-switch input { opacity: 0; width: 0; height: 0; }
-.wc-cs-slider {
+.cs-feature-magazine {
+    margin: 0 20px 16px; background: #fff; overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.06); border-radius: 4px 20px 20px 20px;
+}
+.cs-feature-magazine::before {
+    content: ''; display: block; height: 3px;
+    background: linear-gradient(90deg, #111 0%, #111 30%, #888 30%, #888 60%, #ddd 60%, #ddd 100%);
+}
+.cs-fm-row {
+    display: flex; align-items: center;    padding: 18px 20px;
+    border-bottom: 1px solid rgba(0,0,0,0.04); position: relative; transition: background 0.2s;
+}
+.cs-fm-row:last-child { border-bottom: none; }
+.cs-fm-row:active { background: rgba(0,0,0,0.01); }
+.cs-fm-index {
+    font-family: "Cormorant Garamond", serif; font-size: 28px; font-weight: 300;
+    font-style: italic; color: #e0e0e0; width: 36px; flex-shrink: 0; line-height: 1;
+}
+.cs-fm-content { flex: 1; margin-left: 12px; }
+.cs-fm-title { font-size: 14px; font-weight: 600; color: #111; margin-bottom: 2px; }
+.cs-fm-desc { font-size: 11px; color: #999; }
+.cs-fm-action { flex-shrink: 0; margin-left: 12px; }
+
+.cs-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.cs-switch input { opacity: 0; width: 0; height: 0; }
+.cs-switch-track {
     position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
     background-color: #e5e5e5; transition: .3s; border-radius: 24px;
 }
-.wc-cs-slider:before {
+.cs-switch-track:before {
     position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
     background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-.wc-cs-switch input:checked + .wc-cs-slider { background-color: #111; }
-.wc-cs-switch input:checked + .wc-cs-slider:before { transform: translateX(20px); }
+.cs-switch input:checked + .cs-switch-track { background-color: #111; }
+.cs-switch input:checked + .cs-switch-track:before { transform: translateX(20px); }
 
-.wc-cs-clear-btn {
-    background: none; border: 1.5px solid #e74c3c; color: #e74c3c;
-    padding: 6px 16px; border-radius: 14px; font-size: 12px; font-weight: 600;
-    cursor: pointer; transition: 0.2s;
+.cs-lang-drawer {
+    max-height: 0; opacity: 0; overflow: hidden; padding: 0 20px;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    background: rgba(0,0,0,0.015);
 }
-.wc-cs-clear-btn:active { transform: scale(0.95); background: rgba(231,76,60,0.05); }
+.cs-lang-drawer.open { max-height: 220px; opacity: 1; padding: 16px 20px 20px; }
+.cs-lang-label {
+    font-family: "Space Mono", monospace; font-size: 8px; color: #aaa;
+    letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; display: block;
+}
+.cs-lang-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.cs-lang-pill {
+    padding: 7px 14px; border: 1.5px solid #e0e0e0;
+    border-radius: 2px 16px 16px 2px;
+    font-size: 12px; font-weight: 600; color: #888; background: #fff;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.cs-lang-pill:active { transform: scale(0.95); }
+.cs-lang-pill.active { background: #111; color: #fff; border-color: #111; }
+.cs-lang-custom {
+    width: 100%; border: none; border-bottom: 1px dashed #ddd;
+    background: transparent; font-family: "Space Mono", monospace;
+    font-size: 11px; color: #111; padding: 6px 0; outline: none;
+}
+.cs-lang-custom:focus { border-bottom-color: #111; }
+.cs-lang-custom::placeholder { color: #ccc; }
+
+/* ===== 气泡风格切换卡片 ===== */
+.cs-style-card {
+    margin: 0 20px 16px; background: #111; border-radius: 20px;
+    padding: 20px; position: relative; overflow: hidden;
+}
+.cs-style-card::after {
+    content: '✦'; position: absolute; top: 15px; right: 18px;
+    font-size: 16px; color: rgba(255,255,255,0.04);
+}
+.cs-style-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+}
+.cs-style-label {
+    font-family: "Space Mono", monospace; font-size: 8px; font-weight: 700;
+    color: rgba(255,255,255,0.4); letter-spacing: 2px; text-transform: uppercase;
+}
+.cs-style-current {
+    font-family: "Cormorant Garamond", serif; font-size: 20px; font-weight: 700;
+    font-style: italic; color: #fff; line-height: 1;
+}
+.cs-style-scroll {
+    display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;
+}
+.cs-style-scroll::-webkit-scrollbar { display: none; }
+
+.cs-style-option {
+    flex-shrink: 0; width: 80px; padding: 12px 8px 10px;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px; cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex; flex-direction: column; align-items: center; gap: 8px; position: relative;
+}
+.cs-style-option:active { transform: scale(0.95); }
+.cs-style-option.active {
+    background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.1);
+}
+
+.cs-style-preview {
+    width: 100%; height: 36px; display: flex; flex-direction: column;
+    align-items: flex-start; gap: 3px; padding: 4px 6px;
+}
+.cs-style-bubble {
+    width: 85%; height: 12px; background: rgba(255,255,255,0.15); border-radius: 6px;
+}
+.cs-style-bubble-sm {
+    width: 55%; height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px;
+}
+
+.cs-preview-default { border-radius: 6px; }
+.cs-preview-a { border-left: 2px solid #fff; border-radius: 2px 6px 6px 6px; }
+.cs-preview-b { border-radius: 2px 6px 6px 6px; }
+.cs-preview-c { border-top: 2px solid #fff; border-radius: 2px 6px 6px 6px; padding-top: 1px; }
+.cs-preview-d { border-left: 2px solid rgba(255,255,255,0.6); border-radius: 2px 6px 6px 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+.cs-preview-e { border: 1px solid rgba(255,255,255,0.2); border-radius: 2px 6px 6px 6px; }
+.cs-preview-f { border: 1px solid rgba(255,255,255,0.1); border-radius: 2px 6px 6px 6px; box-shadow: 1px 1px 0 rgba(255,255,255,0.05); }
+
+.cs-style-name {
+    font-family: "Space Mono", monospace; font-size: 7px; font-weight: 700;
+    color: rgba(255,255,255,0.3); letter-spacing: 0.5px; text-align: center;
+}
+.cs-style-option.active .cs-style-name { color: rgba(255,255,255,0.7); }
+
+.cs-style-code {
+    font-family: "Cormorant Garamond", serif; font-size: 14px; font-weight: 700;
+    font-style: italic; color: rgba(255,255,255,0.15); line-height: 1;
+}
+.cs-style-option.active .cs-style-code { color: rgba(255,255,255,0.5); }
+
+.cs-bg-card {
+    margin: 0 20px 16px; background: #fff; border-radius: 20px;
+    padding: 16px; border: 1px solid rgba(0,0,0,0.06);
+}
+.cs-bg-preview {
+    width: 100%; height: 120px; border-radius: 12px;
+    background-color: #f5f4f1; border: 1.5px dashed #ccc;
+    display: flex; justify-content: center; align-items: center;
+    cursor: pointer; overflow: hidden; background-size: cover; background-position: center;
+    transition: all 0.2s;
+}
+.cs-bg-preview:active { transform: scale(0.98); }
+.cs-bg-placeholder {
+    display: flex; flex-direction: column; align-items: center; gap: 6px; color: #aaa;
+}
+.cs-bg-placeholder svg { width: 24px; height: 24px; stroke: #aaa; }
+.cs-bg-placeholder span { font-family: "Space Mono", monospace; font-size: 9px; font-weight: 700; letter-spacing: 1px; }
+.cs-bg-actions {
+    display: flex; justify-content: flex-end; margin-top: 12px;
+}
+.cs-bg-btn {
+    background: #f0f0f0; border: none; color: #111; padding: 6px 16px;
+    border-radius: 12px; font-family: "Space Mono", monospace; font-size: 9px;
+    font-weight: 700; cursor: pointer; transition: 0.2s;
+}
+.cs-bg-btn:active { background: #ddd; transform: scale(0.95); }
+
+.cs-danger-zone { margin: 0 20px 16px; position: relative; }
+.cs-danger-tear {
+    height: 8px; width: 100%;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 8'%3E%3Cpath d='M0 8 Q5 0 10 8 Q15 0 20 8 Q25 0 30 8 Q35 0 40 8 Q45 0 50 8 Q55 0 60 8 Q65 0 70 8 Q75 0 80 8 Q85 0 90 8 Q95 0 100 8' fill='%23fff'/%3E%3C/svg%3E") repeat-x;
+    background-size: 100px 8px; position: relative; z-index: 2;
+}
+.cs-danger-body {
+    background: #fff; padding: 16px 20px 20px; margin-top: -1px;
+    border-left: 3px solid #e74c3c; position: relative;
+}
+.cs-danger-body::before {
+    content: '⚠'; position: absolute; top: 12px; right: 16px;
+    font-size: 20px; opacity: 0.06;
+}
+.cs-danger-head {
+    font-family: "Space Mono", monospace; font-size: 8px; font-weight: 700;
+    color: #e74c3c; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 6px;
+}
+.cs-danger-head::before {
+    content: ''; width: 6px; height: 6px; background: #e74c3c; border-radius: 50%;
+}
+.cs-danger-row { display: flex; justify-content: space-between; align-items: center; }
+.cs-danger-info { display: flex; flex-direction: column; gap: 2px; }
+.cs-danger-title { font-size: 14px; font-weight: 600; color: #e74c3c; }
+.cs-danger-desc { font-size: 11px; color: #999; }
+.cs-danger-btn {
+    background: none; border: 1.5px solid #e74c3c; color: #e74c3c;
+    padding: 7px 18px; border-radius: 2px 14px 14px 14px;
+    font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.2s;
+    font-family: "Space Mono", monospace;
+}
+.cs-danger-btn:active { background: #e74c3c; color: #fff; }
+
+.cs-footer { text-align: center; padding: 40px 0 20px; }
+.cs-footer-diamond {
+    width: 8px; height: 8px; background: #ddd; transform: rotate(45deg);
+    margin: 0 auto 12px;
+}
+.cs-footer-text {
+    font-family: "Space Mono", monospace; font-size: 7px;
+    color: #ccc; letter-spacing: 3px; text-transform: uppercase;
+}
+.cs-footer-line { width: 30px; height: 1px; background: #e0e0e0; margin: 8px auto 0; }
 /* ================= 气泡长按交互与手账便签菜单 ================= */
 .wc-bubble-user, .wc-bubble-bot {
     transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -903,71 +1450,124 @@
 }
 
 /* 遮罩层级降低，确保在气泡下方 */
-.wc-menu-overlay {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-    z-index: 160; opacity: 0; pointer-events: none;
-    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+/* ================= 横向滑动高定菜单 (顶级动画版) ================= */
+.hc-menu-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: transparent;
+    z-index: 9000; opacity: 0; pointer-events: none;
 }
-.wc-menu-overlay.active { opacity: 1; pointer-events: auto; }
+.hc-menu-overlay.show { opacity: 1; pointer-events: auto; }
 
-/* 强制提升聊天列表层级，打破层叠困境 */
-.wc-chat-messages.has-menu {
-    z-index: 166 !important; 
-    position: relative !important;
-}
-.wc-chat-messages.has-menu .wc-msg-row {
-    transition: filter 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.wc-chat-messages.has-menu .wc-msg-row:not(.wc-highlighted) {
-    filter: blur(4px) !important;
-    opacity: 0.2 !important;
-    pointer-events: none !important;
-}
-
-/* 菜单本体 */
-.wc-context-menu {
-    position: absolute; width: 150px; 
-    background: #fdfaf4; border: 1px solid #e8e4d9;
-    border-radius: 2px 4px 12px 2px; 
-    box-shadow: 4px 8px 20px rgba(0,0,0,0.08), inset 0 0 20px rgba(0,0,0,0.02); 
-    padding: 18px 14px 10px; z-index: 9999 !important;
-    opacity: 0; transform: scale(0.8) rotate(0deg); pointer-events: none;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    transform-origin: top center;
-}
-.wc-context-menu.active { opacity: 1; transform: scale(1) rotate(-2deg); pointer-events: auto; }
-
-.wc-context-menu::before {
-    content: ''; position: absolute; top: -6px; left: 50%;
-    transform: translateX(-50%) rotate(3deg);
-    width: 45px; height: 14px; background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    backdrop-filter: blur(2px); z-index: 2;
+.hc-context-outer {
+    position: fixed; z-index: 9999;
+    background: #ffffff;
+    border: 1px solid #111111;
+    border-radius: 40px; 
+    padding: 3px; 
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+    max-width: 260px; 
+    display: flex; align-items: center;
+    opacity: 0; pointer-events: none;
+    transform: translateY(12px) scale(0.85);
+    filter: blur(5px);
+    transition: opacity 0.2s ease, transform 0.25s ease-in, filter 0.2s ease;
 }
 
-.wc-memo-title {
-    font-family: "Space Mono", monospace; font-size: 9px; color: #aaa;
-    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; 
-    text-align: center; border-bottom: 1px solid #111; padding-bottom: 4px;
+/* 出现时的动画：阻尼回弹 + 对焦 */
+.hc-context-outer.show { 
+    opacity: 1; pointer-events: auto; 
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+    transition: opacity 0.3s ease, transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1), filter 0.4s ease;
 }
 
-.wc-menu-item {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 4px; font-family: "Space Mono", monospace; 
-    font-size: 12px; font-weight: 700; color: #333; 
-    border-bottom: 1px dashed #dcd8cc; cursor: pointer; transition: 0.2s;
+.hc-bar-tag {
+    font-family: "Space Mono", monospace; font-size: 6px; 
+    font-weight: 700; color: #aaa;
+    letter-spacing: 1.5px; text-transform: uppercase; writing-mode: vertical-rl;
+    transform: rotate(180deg); padding: 0 3px; margin-right: 2px; flex-shrink: 0;
 }
-.wc-menu-item:last-child { border-bottom: none; }
-.wc-menu-item:active { background: rgba(0,0,0,0.04); transform: scale(0.98); }
 
-.wc-menu-item svg { 
-    width: 14px; height: 14px; stroke: #555; stroke-width: 1.5; 
-    fill: none; stroke-linecap: round; stroke-linejoin: round;
+.hc-context-scroll {
+    display: flex; align-items: center; gap: 2px; 
+    overflow-x: auto; overflow-y: hidden;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 6px; 
+    scrollbar-width: none; 
+    -ms-overflow-style: none;
 }
-.wc-menu-item.danger { color: #d32f2f; }
-.wc-menu-item.danger svg { stroke: #d32f2f; }
+.hc-context-scroll::-webkit-scrollbar { display: none; }
+
+.hc-context-outer::after {
+    content: ''; position: absolute; right: 3px; top: 3px; bottom: 3px; width: 16px;
+    background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,1) 80%);
+    border-radius: 0 30px 30px 0; pointer-events: none;
+}
+
+/* 按钮错落入场动画 */
+@keyframes hcBtnSlideIn {
+    0% { opacity: 0; transform: translateX(10px); }
+    100% { opacity: 1; transform: translateX(0); }
+}
+
+.hc-bar-btn {
+    height: 24px; padding: 0 10px; 
+    border-radius: 20px; border: 1px solid rgba(0,0,0,0.06);
+    background-color: #ffffff; flex-shrink: 0; 
+    background-image: linear-gradient(rgba(0,0,0,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.015) 1px, transparent 1px);
+    background-size: 4px 4px;
+    display: flex; justify-content: center; align-items: center; gap: 4px;
+    cursor: pointer; 
+    opacity: 0; /* 初始隐藏 */
+}
+
+/* 触发按钮动画 */
+.hc-context-outer.show .hc-bar-btn {
+    animation: hcBtnSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 依次延迟入场 */
+.hc-context-outer.show .hc-bar-btn:nth-child(1) { animation-delay: 0.05s; }
+.hc-context-outer.show .hc-bar-btn:nth-child(2) { animation-delay: 0.08s; }
+.hc-context-outer.show .hc-bar-btn:nth-child(3) { animation-delay: 0.11s; }
+.hc-context-outer.show .hc-bar-btn:nth-child(4) { animation-delay: 0.14s; }
+.hc-context-outer.show .hc-bar-btn:nth-child(5) { animation-delay: 0.17s; }
+
+.hc-bar-btn span {
+    font-family: "Cormorant Garamond", serif; font-size: 13px; 
+    font-weight: 600; font-style: italic; color: #111111; line-height: 1; white-space: nowrap;
+}
+.hc-bar-btn::before { content: ''; display: block; width: 2px; height: 2px; background: #111111; border-radius: 50%; opacity: 0.3; }
+
+/* 交互反馈 */
+.hc-bar-btn:active {
+    background-color: #111111;
+    background-image: linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    border-color: #111111;
+}
+.hc-bar-btn:active span { color: #ffffff; }
+.hc-bar-btn:active::before { background: #ffffff; opacity: 1; }
+
+.hc-bar-btn.dark {
+    background-color: #111111; border-color: #111111;
+    background-image: linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+}
+.hc-bar-btn.dark span { color: #ffffff; }
+.hc-bar-btn.dark::before { background: #ffffff; opacity: 0.5; }
+
+.hc-bar-btn.dark:active {
+    background-color: #ffffff; border-color: rgba(0,0,0,0.06);
+    background-image: linear-gradient(rgba(0,0,0,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.015) 1px, transparent 1px);
+}
+.hc-bar-btn.dark:active span { color: #111111; }
+.hc-bar-btn.dark:active::before { background: #111111; opacity: 0.3; }
+
+.hc-bar-btn.danger span { color: #c93a3a; font-style: normal; font-family: -apple-system, sans-serif; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; }
+.hc-bar-btn.danger::before { background: #c93a3a; }
+.hc-bar-btn.danger:active { background-color: #c93a3a; border-color: #c93a3a; }
+.hc-bar-btn.danger:active span { color: #ffffff; }
+.hc-bar-btn.danger:active::before { background: #ffffff; }
 /* ================= 微信 "我" 界面 (Identity) ================= */
 #wc-view-me { background: #f8f8f5; display: none; flex-direction: column; height: 100%; }
 #wc-view-me.active { display: flex; }
@@ -1035,3 +1635,277 @@
 .wc-me-add-mask-btn { display: flex; align-items: center; gap: 8px; padding: 16px 0; cursor: pointer; font-family: "Space Mono", monospace; font-size: 11px; font-weight: 700; color: #111; border-bottom: 1px solid rgba(0,0,0,0.08); transition: 0.2s; }
 .wc-me-add-mask-btn:active { opacity: 0.5; }
 .wc-me-add-mask-btn svg { width: 16px; height: 16px; stroke: #111; fill: none; stroke-width: 2; }
+/* ================= 高定引用与翻译系统 (Editorial Quote & Translate) ================= */
+
+.wc-msg-row { position: relative; }
+.wc-msg-avatar { position: relative; z-index: 5; }
+.wc-bubble-body { position: relative; z-index: 5; }
+
+.wc-bubble-bot.quoted, 
+.wc-bubble-user.quoted {
+    background: transparent !important;
+    color: #111 !important;
+    border: 1.5px solid #111 !important;
+    box-shadow: none !important;
+    opacity: 0.4; 
+    pointer-events: auto; 
+    cursor: pointer;
+}
+
+.wc-bubble-bot.quoted.show-btn .hc-trans-btn,
+.wc-bubble-user.quoted.show-btn .hc-trans-btn { 
+    opacity: 1; 
+    pointer-events: auto; 
+    transform: scale(1);
+}
+
+.quote-tag {
+    position: absolute; top: -16px; font-family: "Space Mono", monospace; 
+    font-size: 8px; font-weight: 700; color: #888; letter-spacing: 1px;
+    opacity: 0; transition: opacity 0.4s ease; pointer-events: none;
+    white-space: nowrap;
+}
+.bot .quote-tag { left: 12px; }
+.user .quote-tag { right: 12px; }
+.quoted .quote-tag { opacity: 1; }
+
+.wc-msg-row.is-quoted::before {
+    content: ''; position: absolute; bottom: -16px;
+    width: 3px; height: 24px;
+    background: #111; opacity: 0.2;
+    border-radius: 2px; z-index: 1;
+}
+.wc-msg-row.bot.is-quoted::before { left: 16px; }
+.wc-msg-row.user.is-quoted::before { right: 16px; }
+
+.wc-msg-row.is-reply::after {
+    content: ''; position: absolute; top: -12px; bottom: 16px;
+    width: 12px; pointer-events: none; opacity: 0.8; z-index: 1;
+}
+.wc-msg-row.bot.is-reply::after {
+    left: 16px;
+    border-left: 3px solid #111;
+    border-top: 3px solid #111;
+    border-top-left-radius: 6px;
+}
+.wc-msg-row.user.is-reply::after {
+    right: 16px;
+    border-right: 3px solid #111;
+    border-top: 3px solid #111;
+    border-top-right-radius: 6px;
+}
+
+.hc-trans-btn {
+    position: absolute; bottom: -4px; right: -4px;
+    background: #111; color: #fff;
+    width: 20px; height: 20px; border-radius: 50%;
+    display: flex; justify-content: center; align-items: center;
+    font-family: "Cormorant Garamond", serif; font-size: 11px; font-style: italic; font-weight: 700;
+    border: 2px solid #f5f4f1; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.3s ease; z-index: 50; cursor: pointer; 
+    opacity: 0; pointer-events: none; transform: scale(0.8);
+}
+.hc-trans-btn::after { content: ''; position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; }
+
+/* 点击气泡后显示按钮 */
+.show-btn .hc-trans-btn {
+    opacity: 1; pointer-events: auto; transform: scale(1);
+}
+
+/* 展开后按钮不消失，而是反转颜色，允许再次点击关闭 */
+.translated .hc-trans-btn { 
+    opacity: 1; pointer-events: auto; transform: scale(1);
+    background: #fff; color: #111; border-color: #111; 
+}
+
+/* 修复拉长气泡的问题：关闭时不影响宽度，开启时自适应 */
+.hc-trans-area { 
+    display: grid; grid-template-rows: 0fr; 
+    transition: grid-template-rows 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+    width: 0; min-width: 100%;
+}
+.translated .hc-trans-area { 
+    grid-template-rows: 1fr; 
+    width: auto; min-width: 0;
+}
+.hc-trans-inner { overflow: hidden; }
+
+.hc-trans-content { 
+    margin-top: 12px; padding-top: 12px; border-top: 0.5px dashed currentColor; opacity: 0.8; 
+    width: 100%; box-sizing: border-box;
+}
+.hc-trans-text { 
+    font-family: "Cormorant Garamond", serif; font-size: 14.5px; line-height: 1.5; 
+    font-weight: 500; letter-spacing: 0.5px; 
+    word-wrap: break-word; white-space: pre-wrap;
+}
+.hc-trans-sys { font-family: "Space Mono", monospace; font-size: 6px; letter-spacing: 1px; opacity: 0.4; margin-top: 6px; text-align: right; }
+
+/* ================= 悬浮胶囊引用提示 ================= */
+.hc-quote-capsule {
+    position: absolute;
+    bottom: 100%; left: 16px; right: 16px; margin-bottom: 8px;
+    background: #111; color: #fff;
+    border-radius: 24px; padding: 8px 16px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    transform: translateY(15px) scale(0.95);
+    opacity: 0; pointer-events: none;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 110;
+}
+.hc-quote-capsule.active {
+    transform: translateY(0) scale(1);
+    opacity: 1; pointer-events: auto;
+}
+.hc-qc-line {
+    width: 2px; height: 16px; background: #fff;
+    opacity: 0.3; border-radius: 1px;
+}
+.hc-qc-content {
+    flex: 1; display: flex; align-items: center; gap: 8px; overflow: hidden;
+}
+.hc-qc-label {
+    font-family: "Space Mono", monospace; font-size: 8px; font-weight: 700;
+    opacity: 0.5; letter-spacing: 1px;
+}
+.hc-qc-text {
+    font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 15px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.hc-qc-close {
+    font-family: "Space Mono", monospace; font-size: 18px; line-height: 1;
+    opacity: 0.4; cursor: pointer; padding: 0 4px; transition: 0.2s;
+}
+.hc-qc-close:active { opacity: 1; transform: scale(0.8); }
+/* ================= 真实照片卡片样式 (6种) ================= */
+.pc-demo-img {
+    width: 100%; height: 200px; object-fit: cover; display: block;
+}
+
+/* 方案 A：拍立得风 (Polaroid) */
+.photo-card-a {
+    background: #fff; padding: 8px 8px 36px 8px; border-radius: 4px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
+    position: relative; transform: rotate(-1.5deg); max-width: 240px;
+}
+.photo-card-a img { border-radius: 2px; }
+.photo-card-a::before {
+    content: ''; position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+    width: 40px; height: 12px; background: rgba(220,215,205,0.7);
+    border-radius: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+.photo-a-text {
+    position: absolute; bottom: 10px; left: 0; width: 100%; text-align: center;
+    font-family: 'Nothing You Could Do', cursive; font-size: 14px; color: #333; opacity: 0.8;
+}
+
+/* 方案 B：极简画廊风 (Gallery) */
+.photo-card-b {
+    background: #fff; border: 1px solid rgba(0,0,0,0.08); border-radius: 16px;
+    overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.02); max-width: 240px;
+}
+.photo-card-b img { border-bottom: 1px solid rgba(0,0,0,0.05); }
+.photo-b-meta { padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; }
+.photo-b-left { display: flex; flex-direction: column; gap: 2px; }
+.photo-b-title { font-family: "Space Mono", monospace; font-size: 8px; font-weight: 700; color: #111; letter-spacing: 1px; text-transform: uppercase; }
+.photo-b-sub { font-family: "Cormorant Garamond", serif; font-size: 12px; font-style: italic; color: #888; }
+.photo-b-icon { width: 24px; height: 24px; border-radius: 50%; background: #f5f4f1; display: flex; justify-content: center; align-items: center; }
+.photo-b-icon svg { width: 12px; height: 12px; stroke: #111; fill: none; stroke-width: 1.5; }
+
+/* 方案 C：胶片底片风 (Film / Tech) */
+.photo-card-c {
+    background: #111; padding: 12px; border-radius: 8px; position: relative;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15); max-width: 240px;
+}
+.photo-card-c img { border-radius: 4px; filter: contrast(1.05) saturate(0.95); }
+.photo-c-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.photo-c-tag { font-family: "Space Mono", monospace; font-size: 7px; font-weight: 700; color: #fff; background: #333; padding: 2px 6px; letter-spacing: 2px; }
+.photo-c-iso { font-family: "Space Mono", monospace; font-size: 8px; color: #888; letter-spacing: 1px; }
+.photo-c-bottom { margin-top: 8px; display: flex; justify-content: space-between; align-items: center; }
+.photo-c-barcode {
+    height: 12px; width: 60px; opacity: 0.5;
+    background: repeating-linear-gradient(90deg, #fff 0px, #fff 1.5px, transparent 1.5px, transparent 3px, #fff 3px, #fff 4px, transparent 4px, transparent 6px);
+}
+.photo-c-date { font-family: "Space Mono", monospace; font-size: 7px; color: #666; letter-spacing: 1px; }
+
+/* 方案 D：暗黑档案风 (Dark Archive) */
+.photo-card-d {
+    background: #111; padding: 8px; border-radius: 20px; max-width: 240px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+.photo-card-d img { border-radius: 14px; }
+.pc1-footer { display: flex; justify-content: space-between; align-items: center; padding: 8px 6px 4px; }
+.pc1-tag { font-family: "Space Mono", monospace; font-size: 8px; font-weight: 700; color: rgba(255,255,255,0.8); letter-spacing: 1.5px; }
+.pc1-barcode {
+    height: 8px; width: 30px;
+    background: repeating-linear-gradient(90deg, rgba(255,255,255,0.3) 0px, rgba(255,255,255,0.3) 1px, transparent 1px, transparent 3px);
+}
+
+/* 方案 E：相纸风 (Slide) */
+.photo-card-e {
+    background: #fff; padding: 8px 8px 28px 8px; border-radius: 16px;
+    border: 1px solid rgba(0,0,0,0.06); max-width: 240px;
+    box-shadow: 2px 4px 16px rgba(0,0,0,0.04); position: relative; transform: rotate(1.5deg);
+}
+.photo-card-e img { border-radius: 10px; border: 1px solid rgba(0,0,0,0.04); }
+.pc2-footer { position: absolute; bottom: 8px; left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: center; }
+.pc2-tag { font-family: "Cormorant Garamond", serif; font-size: 12px; font-weight: 700; font-style: italic; color: #111; }
+.pc2-time { font-family: "Space Mono", monospace; font-size: 7px; color: #999; letter-spacing: 1px; }
+
+/* 方案 F：全画幅悬浮 (Raw Cut) */
+.photo-card-f {
+    max-width: 240px; position: relative; border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden;
+}
+.photo-card-f::after { content: ''; position: absolute; inset: 0; border-radius: 20px; border: 1px solid rgba(0,0,0,0.1); pointer-events: none; }
+.pc3-pill {
+    position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+    background: rgba(17, 17, 17, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.15);
+    display: flex; align-items: center; gap: 6px;
+}
+.pc3-pill-dot { width: 4px; height: 4px; background: #fff; border-radius: 50%; }
+.pc3-pill-text { font-family: "Space Mono", monospace; font-size: 7px; font-weight: 700; color: #fff; letter-spacing: 1px; text-transform: uppercase; }
+/* 去除照片卡片外层的默认气泡背景和边距 */
+.wc-bubble-photo {
+    background: transparent !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+/* ================= 独立回溯时间线 (长按消息下方出现) ================= */
+.wc-rewind-line-overlay {
+    position: fixed;
+    left: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 24px;
+    box-sizing: border-box;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.wc-rewind-line-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+.wc-rewind-line-overlay:active { opacity: 0.7; transform: scale(0.98); }
+.rewind-c-line { flex: 1; height: 1px; border-top: 1px dashed rgba(17,17,17,0.3); }
+.rewind-c-btn { display: flex; align-items: center; gap: 6px; cursor: pointer; background: transparent; }
+.rewind-c-icon {
+    width: 22px; height: 22px; border-radius: 50%; border: 1px solid #111;
+    display: flex; justify-content: center; align-items: center; background: #fcfbf8;
+}
+.rewind-c-icon svg { width: 12px; height: 12px; stroke: #111; fill: none; stroke-width: 2; transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+.wc-rewind-line-overlay:active .rewind-c-icon svg { transform: rotate(-360deg); }
+.rewind-c-text {
+    font-family: "Space Mono", monospace; font-size: 9px; color: #111;
+    letter-spacing: 2px; text-transform: uppercase; font-weight: 700;
+    background: #fcfbf8; padding: 2px 6px; border-radius: 4px;
+}

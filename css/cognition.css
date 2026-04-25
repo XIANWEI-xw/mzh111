@@ -1,92 +1,202 @@
 /* ================= Cognition 记忆库 全局样式 ================= */
 #cognitionApp {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: #f0f0f0; z-index: 160;
+    background: #f5f4f1; z-index: 160;
     display: none; flex-direction: column;
     opacity: 0; transform: scale(0.95); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-#cognitionApp.active {
-    display: flex; opacity: 1; transform: scale(1);
-}
+#cognitionApp.active { display: flex; opacity: 1; transform: scale(1); }
 
-.cog-magazine-header { padding: 60px 30px 20px; position: relative; flex-shrink: 0; }
-.cog-bg-watermark {
-    position: absolute; top: 30px; left: -10px;
-    font-family: "Cormorant Garamond", serif; font-size: 120px; font-weight: 700; color: #e8e8e8;
-    z-index: 1; pointer-events: none;
+.cog-hero { flex-shrink: 0; padding: 55px 24px 0; position: relative; overflow: hidden; }
+.cog-hero-watermark {
+    position: absolute; top: 10px; left: -15px;
+    font-family: "Cormorant Garamond", serif; font-size: 180px; font-weight: 700;
+    font-style: italic; color: rgba(0,0,0,0.03); line-height: 1; pointer-events: none;
 }
-.cog-header-content { position: relative; z-index: 2; }
-.cog-top-meta {
-    font-family: "Space Mono", monospace; font-size: 10px; letter-spacing: 3px; color: #999; text-transform: uppercase;
-    margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+.cog-hero-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; position: relative; z-index: 2; }
+.cog-back {
+    width: 34px; height: 34px; border-radius: 50%; background: #111; border: none; 
+    display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s;
 }
-.cog-back-btn { background: none; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; gap: 6px; color: #111; font-family: "Space Mono", monospace; font-weight: 700; }
-.cog-back-btn:active { opacity: 0.5; }
-.cog-main-title {
-    font-family: "Cormorant Garamond", serif; font-size: 48px; font-weight: 300; color: #111;
-    line-height: 0.9; letter-spacing: -2px;
+.cog-back:active { transform: scale(0.9); }
+.cog-back svg { width: 15px; height: 15px; }
+.cog-hero-meta {
+    font-family: "Space Mono", monospace; font-size: 8px; color: #999;
+    letter-spacing: 2px; text-transform: uppercase; display: flex; align-items: center; gap: 8px;
 }
-.cog-main-title span { font-style: italic; font-weight: 600; }
+.cog-hero-meta-dot { width: 4px; height: 4px; background: #111; border-radius: 50%; }
+.cog-hero-title-area { position: relative; z-index: 2; margin-bottom: 20px; }
+.cog-hero-title {
+    font-family: "Cormorant Garamond", serif; font-size: 52px; font-weight: 300;
+    color: #111; line-height: 0.85; letter-spacing: -2px;
+}
+.cog-hero-title span { display: block; font-style: italic; font-weight: 700; font-size: 48px; }
+.cog-hero-subtitle {
+    font-family: "Space Mono", monospace; font-size: 8px; color: #aaa;
+    letter-spacing: 3px; text-transform: uppercase; margin-top: 10px;
+}
+.cog-stats-bar {
+    display: flex; gap: 0; position: relative; z-index: 2;
+    border-top: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;
+}
+.cog-stat-item {
+    flex: 1; padding: 14px 0; text-align: center; border-right: 1px solid #e0e0e0; position: relative;
+}
+.cog-stat-item:last-child { border-right: none; }
+.cog-stat-num { font-family: "Cormorant Garamond", serif; font-size: 28px; font-weight: 700; color: #111; line-height: 1; }
+.cog-stat-label { font-family: "Space Mono", monospace; font-size: 7px; color: #aaa; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 4px; }
+.cog-stat-dot { position: absolute; top: 8px; right: 8px; width: 5px; height: 5px; border-radius: 50%; }
+.cog-stat-dot.core { background: #8b1e1e; }
+.cog-stat-dot.high { background: #c8a96e; }
+.cog-stat-dot.trace { background: #bbb; }
 
-.cog-filter-nav { padding: 20px 30px; display: flex; gap: 20px; z-index: 2; position: relative; flex-shrink: 0; }
-.cog-filter-item {
-    font-family: "Space Mono", monospace; font-size: 10px; color: #ccc; cursor: pointer; transition: 0.3s;
-    display: flex; align-items: center; gap: 6px;
+.cog-filter-bar {
+    flex-shrink: 0; display: flex; padding: 16px 24px; gap: 8px; position: relative; z-index: 2;
 }
-.cog-filter-item::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: currentColor; opacity: 0; transition: 0.3s; }
-.cog-filter-item.active { color: #111; font-weight: 700; }
-.cog-filter-item.active::before { opacity: 1; }
+.cog-filter-btn {
+    flex: 1; text-align: center; padding: 8px 0; border-radius: 20px;
+    font-family: "Space Mono", monospace; font-size: 9px; font-weight: 700;
+    color: #888; letter-spacing: 1px; cursor: pointer;
+    border: 1px solid rgba(0,0,0,0.05); transition: all 0.25s ease; background: #fff;
+}
+.cog-filter-btn.active { background: #111; color: #fff; border-color: #111; }
+.cog-filter-btn:not(.active):active { transform: scale(0.95); }
 
-.cog-mem-container { flex: 1; overflow-y: auto; padding: 10px 25px 120px; display: flex; flex-direction: column; gap: 30px; scroll-behavior: smooth; }
-.cog-mem-container::-webkit-scrollbar { display: none; }
+.cog-list {
+    flex: 1; overflow-y: auto; padding: 10px 20px 120px;
+    display: flex; flex-direction: column; gap: 14px;
+}
+.cog-list::-webkit-scrollbar { display: none; }
 
 .cog-mem-card { animation: cogFadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
 @keyframes cogFadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-.cog-card-date { font-family: "Space Mono", monospace; font-size: 8px; letter-spacing: 1px; text-transform: uppercase; }
+/* CORE 卡片 */
+.cog-card-core {
+    background: #111; color: #fff; border-radius: 24px; padding: 20px;
+    position: relative; overflow: hidden; cursor: pointer;
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12); transition: transform 0.2s;
+}
+.cog-card-core:active { transform: scale(0.97); }
+.cog-card-core::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 6px; height: 100%;
+    background: linear-gradient(to bottom, #8b1e1e, #c8a96e);
+}
+.cog-core-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.cog-core-badge {
+    font-family: "Space Mono", monospace; font-size: 8px; font-weight: 700;
+    color: #c8a96e; letter-spacing: 1.5px; text-transform: uppercase;
+}
+.cog-core-num {
+    font-family: "Cormorant Garamond", serif; font-size: 24px; font-weight: 300;
+    font-style: italic; color: rgba(255,255,255,0.15); line-height: 1;
+}
+.cog-core-text {
+    font-family: "Cormorant Garamond", serif; font-size: 18px; font-weight: 400;
+    line-height: 1.4; color: #fff; margin-bottom: 16px;
+}
+.cog-core-footer { display: flex; justify-content: space-between; align-items: center; }
+.cog-core-date {
+    font-family: "Space Mono", monospace; font-size: 8px; color: rgba(255,255,255,0.3); letter-spacing: 1px;
+}
+.cog-core-icon {
+    width: 20px; height: 20px; border-radius: 50%; background: rgba(255,255,255,0.1);
+    display: flex; justify-content: center; align-items: center;
+}
+.cog-core-icon svg { width: 10px; height: 10px; stroke: #fff; fill: none; stroke-width: 2; }
 
-.cog-card-core { background: #111; color: #fff; padding: 40px 25px; border-radius: 2px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.15); cursor: pointer; transition: transform 0.4s; }
-.cog-card-core:active { transform: scale(0.98); }
-.cog-card-core .cog-card-label { color: #8b1e1e; font-family: "Space Mono", monospace; font-size: 9px; letter-spacing: 2px; margin-bottom: 15px; display: block; }
-.cog-card-core .cog-card-text { font-family: "Cormorant Garamond", serif; font-size: 22px; line-height: 1.3; font-weight: 300; margin-bottom: 10px; }
-.cog-card-core .cog-card-date { color: rgba(232, 211, 162, 0.5); text-align: right; display: block; }
+/* HIGH 卡片 */
+.cog-card-high {
+    background: #fff; border-radius: 20px; padding: 18px;
+    border: 1px solid rgba(0,0,0,0.04); box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+    cursor: pointer; transition: transform 0.2s; position: relative;
+}
+.cog-card-high:active { transform: scale(0.97); }
+.cog-high-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.cog-high-badge {
+    font-family: "Space Mono", monospace; font-size: 8px; font-weight: 700;
+    color: #111; letter-spacing: 1px; display: flex; align-items: center; gap: 6px;
+}
+.cog-high-badge::before {
+    content: ''; width: 6px; height: 6px; border: 1.5px solid #111; border-radius: 50%;
+}
+.cog-high-text { font-size: 13px; color: #333; line-height: 1.5; margin-bottom: 12px; }
+.cog-high-footer { display: flex; justify-content: space-between; align-items: center; }
+.cog-high-date { font-family: "Space Mono", monospace; font-size: 8px; color: #aaa; letter-spacing: 1px; }
+.cog-high-num { font-family: "Space Mono", monospace; font-size: 8px; color: #ddd; letter-spacing: 1px; }
 
-.cog-card-high { border: 1px solid #111; padding: 25px; border-radius: 2px; align-self: flex-end; width: 90%; cursor: pointer; transition: transform 0.3s; background: #fff; }
-.cog-card-high:active { transform: scale(0.98); }
-.cog-card-high .cog-label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.cog-card-high .cog-card-label { color: #c8a96e; font-family: "Space Mono", monospace; font-size: 9px; letter-spacing: 2px; }
-.cog-card-high .cog-card-date { color: #ccc; }
-.cog-card-high .cog-card-text { font-size: 15px; color: #333; line-height: 1.6; }
+/* TRACE 卡片 */
+.cog-card-trace {
+    background: transparent; border-radius: 16px; padding: 14px 16px;
+    border: 1px dashed rgba(0,0,0,0.15); cursor: pointer; transition: transform 0.2s;
+    display: flex; flex-direction: column; gap: 8px;
+}
+.cog-card-trace:active { transform: scale(0.97); background: rgba(0,0,0,0.02); }
+.cog-trace-top { display: flex; align-items: center; justify-content: space-between; }
+.cog-trace-badge { font-family: "Space Mono", monospace; font-size: 8px; font-weight: 700; color: #999; letter-spacing: 1px; }
+.cog-trace-date { font-family: "Space Mono", monospace; font-size: 7px; color: #bbb; letter-spacing: 1px; }
+.cog-trace-text { font-size: 12px; color: #666; line-height: 1.4; font-style: italic; }
 
-.cog-card-trace { padding: 10px 0 10px 20px; border-left: 1px solid #ddd; width: 80%; cursor: pointer; transition: transform 0.3s; }
-.cog-card-trace:active { transform: translateX(5px); }
-.cog-card-trace .cog-card-label { color: #aaa; font-family: "Space Mono", monospace; font-size: 9px; letter-spacing: 2px; margin-bottom: 5px; display: block; }
-.cog-card-trace .cog-card-text { font-size: 13px; color: #666; font-style: italic; margin-bottom: 6px; line-height: 1.5; }
-.cog-card-trace .cog-card-date { color: #ccc; font-size: 7px; }
+.cog-fab {
+    position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 0; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 10;
+}
+.cog-fab-main {
+    width: 54px; height: 54px; background: #111; border-radius: 50%;
+    display: flex; justify-content: center; align-items: center;
+    cursor: pointer; transition: 0.2s; border: none;
+}
+.cog-fab-main:active { transform: scale(0.9); }
+.cog-fab-main svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 1.5; }
+.cog-fab-label {
+    background: #111; color: #fff; padding: 8px 16px 8px 10px;
+    font-family: "Space Mono", monospace; font-size: 8px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; margin-left: -8px; border-radius: 0 20px 20px 0;
+}
 
-/* 编辑器 Overlay */
-.cog-editor-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(240,240,240,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 100; display: none; flex-direction: column; padding: 80px 30px; opacity: 0; transition: 0.4s; }
-.cog-editor-overlay.active { display: flex; opacity: 1; }
+.cog-editor {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(240,240,240,0.97); backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px); z-index: 100;
+    display: flex; flex-direction: column; padding: 70px 28px 40px;
+    opacity: 0; pointer-events: none; transform: translateY(20px);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cog-editor.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
 
-.cog-edit-header { margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; }
-.cog-edit-type-label { font-family: "Space Mono", monospace; font-size: 10px; color: #a84b4b; letter-spacing: 3px; }
-.cog-edit-date-display { font-family: "Space Mono", monospace; font-size: 10px; color: #999; }
+.cog-edit-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+.cog-edit-type { font-family: "Space Mono", monospace; font-size: 9px; font-weight: 700; color: #8b1e1e; letter-spacing: 3px; text-transform: uppercase; }
+.cog-edit-date { font-family: "Space Mono", monospace; font-size: 9px; color: #999; }
+.cog-edit-textarea {
+    width: 100%; flex: 1; border: none; background: transparent;
+    font-family: "Cormorant Garamond", serif; font-size: 26px; font-weight: 300;
+    color: #111; outline: none; resize: none; line-height: 1.4;
+}
+.cog-edit-textarea::placeholder { color: #ccc; }
 
-.cog-edit-textarea { width: 100%; flex: 1; border: none; background: transparent; font-family: "Cormorant Garamond", serif; font-size: 28px; color: #111; outline: none; resize: none; line-height: 1.4; }
+.cog-edit-bottom { padding-top: 24px; border-top: 1px solid #ddd; }
+.cog-priority-row { display: flex; gap: 10px; margin-bottom: 20px; }
+.cog-p-btn {
+    flex: 1; padding: 10px; text-align: center; border: 1.5px solid #ddd;
+    border-radius: 2px 12px 12px 2px; cursor: pointer; transition: 0.2s;
+    font-family: "Space Mono", monospace; font-size: 8px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase; color: #999; background: #fff;
+}
+.cog-p-btn:active { transform: scale(0.96); }
+.cog-p-btn.active-core { background: #111; color: #fff; border-color: #111; }
+.cog-p-btn.active-high { background: #111; color: #c8a96e; border-color: #111; }
+.cog-p-btn.active-trace { background: #111; color: #999; border-color: #111; }
 
-.cog-edit-footer { padding-top: 30px; border-top: 1px solid #ddd; display: flex; flex-direction: column; gap: 24px; }
-.cog-priority-toggle { display: flex; gap: 15px; }
-.cog-p-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid #ccc; cursor: pointer; position: relative; }
-.cog-p-dot.active::after { content: ''; position: absolute; top: 2px; left: 2px; width: 6px; height: 6px; border-radius: 50%; background: #111; }
-.cog-p-dot.dot-core { border-color: #8b1e1e; }
-.cog-p-dot.dot-core.active::after { background: #8b1e1e; }
-.cog-p-dot.dot-high { border-color: #c8a96e; }
-.cog-p-dot.dot-high.active::after { background: #c8a96e; }
-
-.cog-action-row { display: flex; justify-content: space-between; align-items: center; }
-.cog-btn-delete { font-family: "Space Mono", monospace; font-size: 10px; font-weight: 700; color: #d32f2f; background: none; border: none; cursor: pointer; letter-spacing: 1px; }
-.cog-btn-save { font-family: "Space Mono", monospace; font-size: 12px; font-weight: 700; color: #111; background: none; border: none; cursor: pointer; letter-spacing: 2px; }
-
-.cog-fab { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); width: 60px; height: 60px; background: #fff; border: 1px solid #eee; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 15px 30px rgba(0,0,0,0.05); cursor: pointer; z-index: 10; transition: 0.3s; }
-.cog-fab:active { transform: translateX(-50%) scale(0.9); background: #f9f9f9; }
-.cog-fab svg { width: 24px; height: 24px; stroke: #111; fill: none; stroke-width: 1.5; }
+.cog-edit-actions { display: flex; justify-content: space-between; align-items: center; }
+.cog-btn-del {
+    font-family: "Space Mono", monospace; font-size: 9px; font-weight: 700;
+    color: #d32f2f; background: none; border: none; cursor: pointer;
+    letter-spacing: 1px; padding: 8px 0;
+}
+.cog-btn-del:active { opacity: 0.5; }
+.cog-btn-done {
+    font-family: "Space Mono", monospace; font-size: 11px; font-weight: 700;
+    color: #fff; background: #111; border: none; cursor: pointer;
+    letter-spacing: 2px; padding: 12px 28px; transition: 0.2s;
+}
+.cog-btn-done:active { transform: scale(0.96); background: #333; }

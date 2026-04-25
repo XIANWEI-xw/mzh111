@@ -71,3 +71,33 @@
 .wb-fab { position: absolute; bottom: 30px; right: 20px; width: 50px; height: 50px; background: #111; color: #fff; border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: 0.2s; z-index: 20; }
 .wb-fab:active { transform: scale(0.9); }
 .wb-fab svg { width: 20px; height: 20px; }
+/* ================= 位置选择按钮组 & 关键词输入 ================= */
+.wb-pos-group {
+    display: flex; gap: 8px; margin-bottom: 8px;
+}
+.wb-pos-chip {
+    flex: 1; text-align: center;
+    padding: 10px 8px; border: 1.5px solid #ddd; background: #fff;
+    font-family: "Space Mono", monospace; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.5px; color: #888; cursor: pointer; transition: all 0.2s ease;
+}
+.wb-pos-chip:first-child { border-radius: 0; }
+.wb-pos-chip:last-child { border-radius: 0; }
+.wb-pos-chip:active { transform: scale(0.96); }
+.wb-pos-chip.active { background: #111; color: #fff; border-color: #111; }
+
+.wb-pos-badge {
+    display: inline-block; margin-left: 8px;
+    font-size: 8px; font-weight: 700; letter-spacing: 0.5px;
+    color: #666; background: rgba(0,0,0,0.06);
+    padding: 1px 5px; border-radius: 3px;
+}
+
+.wb-keywords-input {
+    width: 100%; border: none; border-bottom: 1px solid rgba(0,0,0,0.15);
+    background: transparent; font-family: "Space Mono", monospace;
+    font-size: 12px; color: #111; padding: 6px 0;
+    outline: none; transition: 0.2s; box-sizing: border-box;
+}
+.wb-keywords-input:focus { border-bottom-color: #111; }
+.wb-keywords-input::placeholder { color: #ccc; }
