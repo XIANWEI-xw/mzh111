@@ -1119,11 +1119,23 @@ function loadEncSettings() {
 }
 
 // ===== Persona 面板 =====
+function openEncPersonaPanel() {
+    if (!encPersonaOverlay) return;
+    encPersonaOverlay.classList.add('active');
+}
+
+function closeEncPersonaPanel() {
+    if (!encPersonaOverlay) return;
+    encPersonaOverlay.classList.remove('active');
+    saveEncPersonaPresets();
+}
+
 function toggleEncPersonaPanel() {
-    const wasActive = encPersonaOverlay.classList.contains('active');
-    encPersonaOverlay.classList.toggle('active');
-    if (wasActive) {
-        saveEncPersonaPresets();
+    if (!encPersonaOverlay) return;
+    if (encPersonaOverlay.classList.contains('active')) {
+        closeEncPersonaPanel();
+    } else {
+        openEncPersonaPanel();
     }
 }
 function toggleEncPersonaGroup(headerEl) { headerEl.parentElement.classList.toggle('active'); }
