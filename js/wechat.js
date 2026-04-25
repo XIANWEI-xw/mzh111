@@ -9,21 +9,94 @@ let editingContactIndex = -1;
 let wcEditAvatarData = '';
 let currentChatContact = null;
 
-// ================= 1. 本地储存逻辑 (核心) =================
-function loadWeChatData() {
-    const storedContacts = localStorage.getItem('wcContacts');
-    const storedChats = localStorage.getItem('wcChats');
-    const storedMessages = localStorage.getItem('chatMessages');
-    
-    if (storedContacts) wcContacts = JSON.parse(storedContacts);
-    if (storedChats) wcChats = JSON.parse(storedChats);
-    if (storedMessages) chatMessages = JSON.parse(storedMessages);
+window.wcPendingReply = false;
+window.wcPendingQuoteIndex = -1;
+
+window.cancelWcQuote = function() {
+    if (window.wcPendingQuoteIndex >= 0 && currentChatContact) {
+        const contactName = currentChatContact.name;
+        if (chatMessages[contactName] && chatMessages[contactName][window.wcPendingQuoteIndex]) {
+            chatMessages[contactName][window.wcPendingQuoteIndex].isQuoted = false;
+            saveWeChatData();
+            renderChatMessages();
+        }
+    }
+    window.wcPendingReply = false;
+    window.wcPendingQuoteIndex = -1;
+    const ind = document.getElementById('quoteIndicator');
+    if (ind) ind.classList.remove('active');
+};
+
+window.toggleWcTranslate = function(event, btn) {
+    event.stopPropagation();
+    const bubble = btn.closest('.wc-bubble-bot') || btn.closest('.wc-bubble-user');
+    if (bubble) bubble.classList.toggle('translated');
+};
+
+// ================= 1. 无限储存引擎 (IndexedDB) =================
+const DB_NAME = 'StudioZeroDB';
+const STORE_NAME = 'WeChatStore';
+
+function initDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, 1);
+        request.onupgradeneeded = (e) => {
+            e.target.result.createObjectStore(STORE_NAME);
+        };
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+async function idbSet(key, value) {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).put(value, key);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+    });
+}
+
+async function idbGet(key) {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const request = tx.objectStore(STORE_NAME).get(key);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+async function loadWeChatData() {
+    try {
+        const storedContacts = await idbGet('wcContacts');
+        const storedChats = await idbGet('wcChats');
+        const storedMessages = await idbGet('chatMessages');
+
+        // 如果 IndexedDB 里有数据就用，没有就去 localStorage 里找（兼容老数据迁移）
+        if (storedContacts) wcContacts = storedContacts;
+        else if (localStorage.getItem('wcContacts')) wcContacts = JSON.parse(localStorage.getItem('wcContacts'));
+
+        if (storedChats) wcChats = storedChats;
+        else if (localStorage.getItem('wcChats')) wcChats = JSON.parse(localStorage.getItem('wcChats'));
+
+        if (storedMessages) chatMessages = storedMessages;
+        else if (localStorage.getItem('chatMessages')) chatMessages = JSON.parse(localStorage.getItem('chatMessages'));
+        
+        // 刷新列表
+        renderContacts();
+        renderChats();
+    } catch (e) {
+        console.error("Failed to load from DB", e);
+    }
 }
 
 function saveWeChatData() {
-    localStorage.setItem('wcContacts', JSON.stringify(wcContacts));
-    localStorage.setItem('wcChats', JSON.stringify(wcChats));
-    localStorage.setItem('chatMessages', JSON.stringify(chatMessages));
+    // 异步存入硬盘，不再受 5MB 限制
+    idbSet('wcContacts', wcContacts);
+    idbSet('wcChats', wcChats);
+    idbSet('chatMessages', chatMessages);
 }
 
 // 页面加载时立刻读取数据
@@ -92,6 +165,9 @@ function updateWeChatClock() {
     let m = now.getMinutes().toString().padStart(2, '0');
     const wcClock = document.getElementById('wc-clock');
     if(wcClock) wcClock.innerText = `${h}:${m}`;
+    
+    const wcChatClock = document.getElementById('wc-chat-clock');
+    if(wcChatClock) wcChatClock.innerText = `${h}:${m}`;
 }
 setInterval(updateWeChatClock, 1000);
 
@@ -127,6 +203,8 @@ function customWcTag(el) {
 }
 
 function openNewContactModal() {
+    playWcClickSound();
+    if (navigator.vibrate) navigator.vibrate(8);
     document.getElementById('wcContactName').value = '';
     document.getElementById('wcContactPersona').value = '';
     wcAvatarData = '';
@@ -146,6 +224,8 @@ function closeNewContactModal() {
 }
 
 function saveNewContact() {
+    playWcSaveSound();
+    if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
     const name = document.getElementById('wcContactName').value.trim();
     const persona = document.getElementById('wcContactPersona').value.trim() || 'No persona description provided.';
     const activeTag = document.querySelector('.wc-group-tag.active');
@@ -232,6 +312,8 @@ function previewEditAvatar(event) {
 
 function saveEditContact() {
     if (editingContactIndex < 0) return;
+    playWcSaveSound();
+    if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
 
     const oldName = wcContacts[editingContactIndex].name;
     const newName = document.getElementById('wcEditContactName').value.trim();
@@ -269,6 +351,8 @@ function saveEditContact() {
 
 function deleteContact() {
     if (editingContactIndex < 0) return;
+    playWcDangerSound();
+    if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
     if (!confirm('Delete this AI Persona and all chat history?')) return;
 
     const deletedName = wcContacts[editingContactIndex].name;
@@ -339,12 +423,17 @@ function renderChats() {
 
     let html = '';
     wcChats.forEach((chat, index) => {
-        const avatarContent = chat.avatar 
-            ? `<img src="${chat.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:2px;">` 
+        const chatContactIndex = wcContacts.findIndex(c => c.name === chat.name);
+        const contact = wcContacts[chatContactIndex];
+        
+        const displayName = (contact && contact.chatName) ? contact.chatName : chat.name;
+        const displayAvatar = (contact && contact.avatar) ? contact.avatar : chat.avatar;
+
+        const avatarContent = displayAvatar 
+            ? `<img src="${displayAvatar}" style="width:100%;height:100%;object-fit:cover;border-radius:2px;">` 
             : '🤖';
         const randomDeco = decoTexts[index % decoTexts.length];
         const randomStars = decoStars[index % decoStars.length];
-        const chatContactIndex = wcContacts.findIndex(c => c.name === chat.name);
         
         html += `
             <div class="wc-chat-item" onclick="openChatView(${chatContactIndex})">
@@ -359,7 +448,7 @@ function renderChats() {
                 </div>
                 <div class="wc-chat-info">
                     <div class="wc-chat-header">
-                        <span class="wc-chat-name">${chat.name}</span>
+                        <span class="wc-chat-name">${displayName}</span>
                         <span class="wc-chat-time">${chat.time}</span>
                     </div>
                     <div class="wc-chat-msg">${chat.msg}</div>
@@ -386,7 +475,11 @@ function openChatView(contactIndex) {
     isFetchingMoreChats = false;
     chatScrollListenerActive = false;
     
-    document.getElementById('wcChatName').textContent = contact.name;
+    const displayName = contact.chatName || contact.name;
+    document.getElementById('wcChatName').textContent = displayName;
+    const watermarkEl = document.getElementById('wcChatWatermark');
+    if (watermarkEl) watermarkEl.textContent = displayName.charAt(0).toUpperCase() + '.';
+    
     const avatarEl = document.getElementById('wcChatAvatar');
     if (contact.avatar) {
         avatarEl.innerHTML = `<img src="${contact.avatar}" style="width:100%;height:100%;object-fit:cover;">`;
@@ -402,6 +495,8 @@ function openChatView(contactIndex) {
     container.removeEventListener('scroll', handleChatScroll);
     
     renderChatMessages(true);
+    applyBubbleStyle(contact.bubbleStyle || 'default');
+    applyChatBg();
     document.getElementById('wcChatView').classList.add('active');
 
     setTimeout(() => {
@@ -436,6 +531,11 @@ function handleChatScroll() {
 function closeChatView() {
     document.getElementById('wcChatView').classList.remove('active');
     
+    closeWcPlusMenu();
+    if (window.wcPendingReply) {
+        window.cancelWcQuote();
+    }
+    
     if (currentChatContact && chatMessages[currentChatContact.name]) {
         const msgs = chatMessages[currentChatContact.name];
         if (msgs.length > 0) {
@@ -461,13 +561,103 @@ function sendWcMessageOnly() {
     playWcSendSound();
     triggerWcHaptic('send');
     
-    const newMsg = { role: 'user', text: text, time: getCurrentTime() };
+    let finalText = text;
+    const newMsg = { role: 'user', text: finalText, time: getCurrentTime() };
+    
+    if (window.wcPendingReply && window.wcPendingQuoteIndex >= 0) {
+        newMsg.isReply = true;
+        newMsg.replyToIndex = window.wcPendingQuoteIndex;
+        window.wcPendingReply = false;
+        window.wcPendingQuoteIndex = -1;
+        const quoteIndicator = document.getElementById('quoteIndicator');
+        if (quoteIndicator) quoteIndicator.classList.remove('active');
+    }
+
     chatMessages[currentChatContact.name].push(newMsg);
     saveWeChatData(); 
     
     input.value = '';
     appendChatMessageToDOM(newMsg); 
 }
+
+window.sendWcPhotoMessage = function(event) {
+    const file = event.target.files[0];
+    if (!file || !currentChatContact) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            // 既然空间无限了，提高照片清晰度
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 1200; // 提高分辨率
+            const MAX_HEIGHT = 1200; 
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width;
+                    width = MAX_WIDTH;
+                }
+            } else {
+                if (height > MAX_HEIGHT) {
+                    width *= MAX_HEIGHT / height;
+                    height = MAX_HEIGHT;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // 提高画质到 0.85
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+            if (typeof playWcSendSound === 'function') playWcSendSound();
+            if (typeof triggerWcHaptic === 'function') triggerWcHaptic('send');
+
+            const pStyle = currentChatContact.photoStyle || 'a';
+            let imgHtml = '';
+            const timeStr = getCurrentTime();
+            const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+            if (pStyle === 'a') {
+                imgHtml = `<div class="photo-card-a"><img src="${compressedDataUrl}" class="pc-demo-img"><div class="photo-a-text">Captured moment</div></div>`;
+            } else if (pStyle === 'b') {
+                imgHtml = `<div class="photo-card-b"><img src="${compressedDataUrl}" class="pc-demo-img"><div class="photo-b-meta"><div class="photo-b-left"><span class="photo-b-title">VISION LENS</span><span class="photo-b-sub">Uploaded Image</span></div><div class="photo-b-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg></div></div></div>`;
+            } else if (pStyle === 'c') {
+                imgHtml = `<div class="photo-card-c"><div class="photo-c-top"><div class="photo-c-tag">RAW</div><div class="photo-c-iso">ISO 400</div></div><img src="${compressedDataUrl}" class="pc-demo-img"><div class="photo-c-bottom"><div class="photo-c-barcode"></div><div class="photo-c-date">${dateStr}</div></div></div>`;
+            } else if (pStyle === 'd') {
+                imgHtml = `<div class="photo-card-d"><img src="${compressedDataUrl}" class="pc-demo-img"><div class="pc1-footer"><span class="pc1-tag">LENS // VISION</span><div class="pc1-barcode"></div></div></div>`;
+            } else if (pStyle === 'e') {
+                imgHtml = `<div class="photo-card-e"><img src="${compressedDataUrl}" class="pc-demo-img"><div class="pc2-footer"><span class="pc2-tag">Captured.</span><span class="pc2-time">${timeStr}</span></div></div>`;
+            } else if (pStyle === 'f') {
+                imgHtml = `<div class="photo-card-f"><img src="${compressedDataUrl}" class="pc-demo-img"><div class="pc3-pill"><div class="pc3-pill-dot"></div><span class="pc3-pill-text">LENS · ${timeStr}</span></div></div>`;
+            } else {
+                imgHtml = `<img src="${compressedDataUrl}" style="max-width: 100%; border-radius: 8px; display: block; margin: 4px 0;">`;
+            }
+            
+            const newMsg = { 
+                role: 'user', 
+                text: imgHtml, 
+                visionUrl: compressedDataUrl,
+                time: timeStr 
+            };
+
+            // 存入数组并异步保存，无需再捕获容量错误
+            chatMessages[currentChatContact.name].push(newMsg);
+            saveWeChatData();
+            
+            appendChatMessageToDOM(newMsg);
+            closeWcPlusMenu();
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+    event.target.value = '';
+};
 
 function triggerAICall() {
     if (!currentChatContact) return;
@@ -480,6 +670,16 @@ function triggerAICall() {
         triggerWcHaptic('send');
 
         const newMsg = { role: 'user', text: text, time: getCurrentTime() };
+        
+        if (window.wcPendingReply && window.wcPendingQuoteIndex >= 0) {
+            newMsg.isReply = true;
+            newMsg.replyToIndex = window.wcPendingQuoteIndex;
+            window.wcPendingReply = false;
+            window.wcPendingQuoteIndex = -1;
+            const quoteIndicator = document.getElementById('quoteIndicator');
+            if (quoteIndicator) quoteIndicator.classList.remove('active');
+        }
+
         chatMessages[currentChatContact.name].push(newMsg);
         input.value = '';
         appendChatMessageToDOM(newMsg); 
@@ -504,8 +704,19 @@ async function callChatAPI(contact, messages) {
     }
 
     const apiMessages = [];
-    
-    let systemPrompt = contact.persona || 'You are a helpful AI assistant.';
+
+    let wbData = { before: '', middle: '', after: '' };
+    if (typeof getWorldbookPrompt === 'function') {
+        wbData = getWorldbookPrompt(contact.name, messages);
+    }
+
+    let systemPrompt = '';
+
+    if (wbData.before) {
+        systemPrompt += wbData.before + '\n\n';
+    }
+
+    systemPrompt += contact.persona || 'You are a helpful AI assistant.';
     
     if (contact.userMask && contact.userMask.trim() !== '') {
         systemPrompt += '\n\n[User Persona / Background]:\n' + contact.userMask;
@@ -515,19 +726,63 @@ async function callChatAPI(contact, messages) {
         systemPrompt += getCognitionPrompt(contact.name);
     }
 
-    systemPrompt += '\n\n[Format Rule] You MUST split your reply into short separate messages, one sentence or one thought per line. Use "||" as a separator between each message. Do not send one long paragraph. Example format: "Hello!||How are you?||I missed you."';
+    if (wbData.after) {
+        systemPrompt += wbData.after;
+    }
+
+    const bilingualLang = contact.bilingualLang || 'Chinese';
+    if (contact.bilingual) {
+        systemPrompt += '\n\n[Format Rule] You MUST split your reply into short separate messages using "||" as separator. For EACH segment, provide the original text first, then "<<TL>>" followed by the ' + bilingualLang + ' translation. Format: "original text<<TL>>translated text||next original<<TL>>next translation". Example: "Hello! How are you?<<TL>>你好！你好吗？||I missed you so much<<TL>>我好想你". Every single segment MUST have <<TL>> with translation. No exceptions.';
+    } else {
+        systemPrompt += '\n\n[Format Rule] You MUST split your reply into short separate messages, one sentence or one thought per line. Use "||" as a separator between each message. Do not send one long paragraph. Example format: "Hello!||How are you?||I missed you."';
+    }
+    systemPrompt += '\n\n[Quote Rule — CRITICAL]\nEvery message has a hidden tag like [#0], [#1], [#2]... Use >>Q#number<< to quote by index number. This is precise and reliable.\nFrequency: Use quoting in roughly 1 out of every 3-4 replies. Be generous.\nYou may quote MULTIPLE messages in one reply on DIFFERENT segments.\nFormat: >>Q#5<<Your reply text\nExamples:\nSingle quote: ">>Q#3<<Are you okay?||Let me know if you need anything."\nMultiple quotes: ">>Q#2<<Are you okay?||>>Q#5<<That might be why!||You should eat something."\nDo NOT include [#number] tags in your own reply text. Only use >>Q#number<< for quoting.\nWhen NOT to quote: Simple greetings, very short exchanges with no prior context worth referencing.';
     
     apiMessages.push({ role: 'system', content: systemPrompt });
     
     const contextRounds = parseInt(settings.contextRounds) || 10;
     const maxMessages = contextRounds * 2; 
     const contextMessages = messages.slice(-maxMessages);
+
+    const midPoint = Math.floor(contextMessages.length / 2);
+    let middleInjected = false;
     
-    contextMessages.forEach(msg => {
-        apiMessages.push({
-            role: msg.role === 'user' ? 'user' : 'assistant',
-            content: msg.text
-        });
+    contextMessages.forEach((msg, idx) => {
+        if (wbData.middle && !middleInjected && idx >= midPoint && midPoint > 0) {
+            apiMessages.push({
+                role: 'system',
+                content: wbData.middle
+            });
+            middleInjected = true;
+        }
+
+        const globalIdx = messages.length - contextMessages.length + idx;
+        const tag = `[#${globalIdx}]`;
+
+        let rawText = msg.text;
+        if (rawText.includes('<img')) {
+            rawText = '[User sent a photo]';
+        }
+
+        let msgContent = `${tag} ${rawText}`;
+        if (msg.role === 'user' && msg.replyToIndex !== undefined && msg.replyToIndex >= 0) {
+            msgContent = `${tag} [RE:#${msg.replyToIndex}] ${rawText}`;
+        }
+
+        if (msg.visionUrl) {
+            apiMessages.push({
+                role: msg.role === 'user' ? 'user' : 'assistant',
+                content: [
+                    { type: "text", text: msgContent },
+                    { type: "image_url", image_url: { url: msg.visionUrl } }
+                ]
+            });
+        } else {
+            apiMessages.push({
+                role: msg.role === 'user' ? 'user' : 'assistant',
+                content: msgContent
+            });
+        }
     });
 
     const tempEl = document.getElementById('tempValText');
@@ -568,11 +823,49 @@ async function callChatAPI(contact, messages) {
                     playWcReceiveSound();
                     triggerWcHaptic('receive');
 
-                    const newMsg = { role: 'bot', text: parts[i], time: getCurrentTime() };
+                    let partText = parts[i];
+                    let isReplyMsg = false;
+
+                    const quoteMatch = partText.match(/^>>Q#(\d+)<<(.*)$/s);
+                    if (quoteMatch) {
+                        const quotedIdx = parseInt(quoteMatch[1]);
+                        const afterQuote = quoteMatch[2].trim();
+                        if (afterQuote) partText = afterQuote;
+
+                        const allMsgs = chatMessages[contact.name];
+
+                        if (quotedIdx >= 0 && quotedIdx < allMsgs.length) {
+                            allMsgs[quotedIdx].isQuoted = true;
+                            isReplyMsg = true;
+                        }
+                    }
+
+                    partText = partText.replace(/\[#\d+\]\s*/g, '');
+
+                    let translationText = '';
+                    if (contact.bilingual) {
+                        const tlMatch = partText.match(/^([\s\S]*?)<<TL>>([\s\S]*)$/);
+                        if (tlMatch) {
+                            partText = tlMatch[1].trim();
+                            translationText = tlMatch[2].trim();
+                        }
+                    }
+
+                    const newMsg = { role: 'bot', text: partText, time: getCurrentTime() };
+                    if (isReplyMsg) newMsg.isReply = true;
+                    if (translationText) newMsg.translation = translationText;
+
                     chatMessages[contact.name].push(newMsg);
                     saveWeChatData(); 
-                    
-                    appendChatMessageToDOM(newMsg); 
+
+                    renderChatMessages();
+
+                    if (typeof shouldShowNotification === 'function' && shouldShowNotification(contact.name)) {
+                        if (typeof pushHcNotification === 'function') {
+                            pushHcNotification(contact, partText);
+                        }
+                    }
+
                     resolve();
                 }, i === 0 ? 0 : 400 + Math.random() * 600);
             });
@@ -587,6 +880,13 @@ async function callChatAPI(contact, messages) {
 }
 
 function getChatAvatars() {
+    if (!currentChatContact) {
+        return {
+            aiAvatar: '<div class="wc-msg-avatar">🤖</div>',
+            userAvatar: '<div class="wc-msg-avatar" style="background:#ddd;">👤</div>'
+        };
+    }
+
     const aiAvatar = currentChatContact.avatar 
         ? `<div class="wc-msg-avatar"><img src="${currentChatContact.avatar}"></div>` 
         : '<div class="wc-msg-avatar">🤖</div>';
@@ -605,13 +905,9 @@ function renderChatMessages(isFirstLoad = false, oldScrollHeight = 0) {
     const msgs = chatMessages[currentChatContact.name] || [];
     const { aiAvatar, userAvatar } = getChatAvatars();
     
-    // 先隐藏容器，防止滚动跳闪
-    if (isFirstLoad) {
-        container.style.visibility = 'hidden';
-    }
+    if (isFirstLoad) container.style.visibility = 'hidden';
     
     let html = '<div class="wc-chat-deco-watermark">DIALOGUE</div>';
-    
     let startIndex = Math.max(0, msgs.length - currentChatDisplayLimit);
 
     if (startIndex > 0) {
@@ -627,20 +923,55 @@ function renderChatMessages(isFirstLoad = false, oldScrollHeight = 0) {
     
     displayMsgs.forEach((msg, i) => {
         const realIndex = startIndex + i;
+        
+        let rowClasses = `wc-msg-row ${msg.role}`;
+        if (msg.isQuoted) rowClasses += ' is-quoted';
+        if (msg.isReply) rowClasses += ' is-reply';
+
+        let bubbleClasses = msg.role === 'bot' ? 'wc-bubble-bot' : 'wc-bubble-user';
+        if (msg.visionUrl) bubbleClasses = 'wc-bubble-photo'; // 去除图片外层气泡
+        if (msg.isQuoted) bubbleClasses += ' quoted';
+
+        const quoteTagHtml = `<div class="quote-tag">QUOTED ↴</div>`;
+        
+        let transHtml = '';
+        if (msg.role === 'bot' && currentChatContact.bilingual) {
+            transHtml = `
+                <div class="hc-trans-btn" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" onclick="toggleWcTranslate(event, this)">A</div>
+                <div class="hc-trans-area">
+                    <div class="hc-trans-inner">
+                        <div class="hc-trans-content">
+                            <div class="hc-trans-text">${msg.translation || '翻译服务已就绪，等待 API 接入...'}</div>
+                            <div class="hc-trans-sys">SYS.TRANSLATE</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         if (msg.role === 'bot') {
             html += `
-                <div class="wc-msg-row bot" data-index="${realIndex}">
+                <div class="${rowClasses}" data-index="${realIndex}">
                     ${aiAvatar}
                     <div class="wc-bubble-body">
-                        <div class="wc-bubble-bot">${msg.text}</div>
+                        <div class="${bubbleClasses}" onclick="this.classList.toggle('show-btn')">
+                            ${quoteTagHtml}
+                            ${msg.text}
+                            ${transHtml}
+                        </div>
                         <div class="wc-bubble-action"><span onclick="copyBubbleText(this)">Copy</span></div>
                     </div>
                 </div>
             `;
         } else {
             html += `
-                <div class="wc-msg-row user" data-index="${realIndex}">
-                    <div class="wc-bubble-body"><div class="wc-bubble-user">${msg.text}</div></div>
+                <div class="${rowClasses}" data-index="${realIndex}">
+                    <div class="wc-bubble-body">
+                        <div class="${bubbleClasses}" onclick="this.classList.toggle('show-btn')">
+                            ${quoteTagHtml}
+                            ${msg.text}
+                        </div>
+                    </div>
                     ${userAvatar}
                 </div>
             `;
@@ -650,7 +981,6 @@ function renderChatMessages(isFirstLoad = false, oldScrollHeight = 0) {
     container.innerHTML = html;
     
     if (isFirstLoad) {
-        // 同步设好滚动位置，然后再显示
         container.scrollTop = container.scrollHeight;
         requestAnimationFrame(() => {
             container.scrollTop = container.scrollHeight;
@@ -658,12 +988,10 @@ function renderChatMessages(isFirstLoad = false, oldScrollHeight = 0) {
             bindBubbleLongPress();
         });
     } else if (oldScrollHeight > 0) {
-        // 加载更多历史：保持阅读位置
         requestAnimationFrame(() => {
             const addedHeight = container.scrollHeight - oldScrollHeight;
             container.scrollTop = addedHeight + 60;
             bindBubbleLongPress();
-            
             setTimeout(() => {
                 isFetchingMoreChats = false;
                 chatScrollListenerActive = true;
@@ -671,7 +999,6 @@ function renderChatMessages(isFirstLoad = false, oldScrollHeight = 0) {
             }, 800);
         });
     } else {
-        // 删除/编辑消息后重新渲染
         container.scrollTop = container.scrollHeight;
         requestAnimationFrame(() => {
             container.scrollTop = container.scrollHeight;
@@ -681,26 +1008,62 @@ function renderChatMessages(isFirstLoad = false, oldScrollHeight = 0) {
 }
 
 function appendChatMessageToDOM(msg) {
+    if (!currentChatContact) return;
     const container = document.getElementById('wcChatMessages');
     if (!container) return;
     const { aiAvatar, userAvatar } = getChatAvatars();
     
     const index = chatMessages[currentChatContact.name].length - 1;
+    
+    let rowClasses = `wc-msg-row ${msg.role}`;
+    if (msg.isQuoted) rowClasses += ' is-quoted';
+    if (msg.isReply) rowClasses += ' is-reply';
+
+    let bubbleClasses = msg.role === 'bot' ? 'wc-bubble-bot' : 'wc-bubble-user';
+    if (msg.visionUrl) bubbleClasses = 'wc-bubble-photo'; // 去除图片外层气泡
+    if (msg.isQuoted) bubbleClasses += ' quoted';
+
+    const quoteTagHtml = `<div class="quote-tag">QUOTED ↴</div>`;
+    
+    let transHtml = '';
+    if (msg.role === 'bot' && currentChatContact.bilingual) {
+        transHtml = `
+            <div class="hc-trans-btn" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" onclick="toggleWcTranslate(event, this)">A</div>
+            <div class="hc-trans-area">
+                <div class="hc-trans-inner">
+                    <div class="hc-trans-content">
+                        <div class="hc-trans-text">${msg.translation || '翻译服务已就绪，等待 API 接入...'}</div>
+                        <div class="hc-trans-sys">SYS.TRANSLATE</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
     let html = '';
     if (msg.role === 'bot') {
         html = `
-            <div class="wc-msg-row bot" data-index="${index}">
+            <div class="${rowClasses} animate-pop" data-index="${index}">
                 ${aiAvatar}
                 <div class="wc-bubble-body">
-                    <div class="wc-bubble-bot">${msg.text}</div>
+                    <div class="${bubbleClasses}" onclick="this.classList.toggle('show-btn')">
+                        ${quoteTagHtml}
+                        ${msg.text}
+                        ${transHtml}
+                    </div>
                     <div class="wc-bubble-action"><span onclick="copyBubbleText(this)">Copy</span></div>
                 </div>
             </div>
         `;
     } else {
         html = `
-            <div class="wc-msg-row user" data-index="${index}">
-                <div class="wc-bubble-body"><div class="wc-bubble-user">${msg.text}</div></div>
+            <div class="${rowClasses} animate-pop" data-index="${index}">
+                <div class="wc-bubble-body">
+                    <div class="${bubbleClasses}" onclick="this.classList.toggle('show-btn')">
+                        ${quoteTagHtml}
+                        ${msg.text}
+                    </div>
+                </div>
                 ${userAvatar}
             </div>
         `;
@@ -723,7 +1086,8 @@ let wcPressTimer;
 let currentLongPressRow = null;
 
 function bindBubbleLongPress() {
-    const bubbles = document.querySelectorAll('.wc-bubble-user, .wc-bubble-bot');
+    // 【修复】：加入了 .wc-bubble-photo 使得照片卡片也能触发长按菜单
+    const bubbles = document.querySelectorAll('.wc-bubble-user, .wc-bubble-bot, .wc-bubble-photo');
     
     bubbles.forEach(bubble => {
         bubble.ontouchstart = null; bubble.onmousedown = null;
@@ -759,65 +1123,88 @@ function showWcContextMenu(event, bubble) {
 
     currentLongPressRow = bubble.closest('.wc-msg-row');
     
-    // 【终极防遮挡魔法】：用 JS 直接强行提升当前气泡和整个聊天列表的层级
     currentLongPressRow.style.zIndex = '999';
     currentLongPressRow.style.position = 'relative';
 
     const chatMsgs = document.getElementById('wcChatMessages');
-    chatMsgs.style.zIndex = '170';
-    chatMsgs.style.position = 'relative';
 
-    // 强行把其他没被选中的气泡变暗模糊
     const allRows = chatMsgs.querySelectorAll('.wc-msg-row');
     allRows.forEach(row => {
         if (row !== currentLongPressRow) {
             row.style.transition = 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)';
-            row.style.filter = 'blur(4px)';
-            row.style.opacity = '0.2';
+            row.style.opacity = '0.3';
             row.style.pointerEvents = 'none';
         }
     });
 
     const rect = bubble.getBoundingClientRect();
-    const isUser = currentLongPressRow.classList.contains('user');
     const menu = document.getElementById('wcContextMenu');
     const overlay = document.getElementById('wcMenuOverlay');
     
-    let menuTop = rect.bottom + 10;
-    let menuLeft = isUser ? (rect.right - 150) : rect.left;
+    menu.style.display = 'flex';
     
-    menu.style.transformOrigin = 'top center';
+    const menuWidth = menu.offsetWidth;
+    const menuHeight = menu.offsetHeight;
+    
+    let menuTop = rect.top - menuHeight - 15;
+    let menuLeft = rect.left + (rect.width / 2) - (menuWidth / 2);
 
-    if (menuTop + 180 > window.innerHeight) {
-        menuTop = rect.top - 180;
+    if (menuTop < 50) {
+        menuTop = rect.bottom + 15;
+        menu.style.transformOrigin = 'top center';
+    } else {
         menu.style.transformOrigin = 'bottom center';
     }
 
-    menu.style.top = `${menuTop}px`;
-    menu.style.left = `${menuLeft}px`;
+    if (menuLeft < 10) menuLeft = 10;
+    if (menuLeft + menuWidth > window.innerWidth - 10) {
+            menuLeft = window.innerWidth - menuWidth - 10;
+        }
 
-    overlay.classList.add('active');
-    menu.classList.add('active');
-}
+        menu.style.top = `${menuTop}px`;
+        menu.style.left = `${menuLeft}px`;
 
-function closeWcContextMenu() {
-    document.getElementById('wcMenuOverlay').classList.remove('active');
-    document.getElementById('wcContextMenu').classList.remove('active');
-    
-    // 【解除魔法】：恢复所有层级和亮度
-    const chatMsgs = document.getElementById('wcChatMessages');
+        // 动态定位回溯线到当前消息的正下方
+        const rowRect = currentLongPressRow.getBoundingClientRect();
+        const rewindLine = document.getElementById('wcRewindLine');
+        if (rewindLine) {
+            rewindLine.style.top = (rowRect.bottom + 8) + 'px';
+        }
+
+        const scrollArea = menu.querySelector('.hc-context-scroll');
+        if (scrollArea) scrollArea.scrollLeft = 0;
+
+        requestAnimationFrame(() => {
+            overlay.classList.add('show');
+            menu.classList.add('show');
+            if (rewindLine) rewindLine.classList.add('show'); // 显示回溯线
+        });
+    }
+
+
+    function closeWcContextMenu() {
+        const overlay = document.getElementById('wcMenuOverlay');
+        const menu = document.getElementById('wcContextMenu');
+        const rewindLine = document.getElementById('wcRewindLine');
+
+        if (overlay) overlay.classList.remove('show');
+        if (menu) menu.classList.remove('show');
+        if (rewindLine) rewindLine.classList.remove('show'); // 隐藏回溯线
+        
+        const chatMsgs = document.getElementById('wcChatMessages');
     if (chatMsgs) {
-        chatMsgs.style.zIndex = '';
         const allRows = chatMsgs.querySelectorAll('.wc-msg-row');
         allRows.forEach(row => {
             row.style.filter = '';
             row.style.opacity = '';
             row.style.pointerEvents = '';
+            row.style.transition = '';
         });
     }
 
     if (currentLongPressRow) {
         currentLongPressRow.style.zIndex = '';
+        currentLongPressRow.style.position = '';
         currentLongPressRow = null;
     }
 }
@@ -846,18 +1233,46 @@ function handleWcMenuAction(action) {
         }
         
     } else if (action === 'Quote') {
-        const input = document.getElementById('wcChatInput');
-        input.value = `「${targetMsg.text}」\n`;
-        input.focus();
+        chatMessages[contactName][index].isQuoted = true;
+        saveWeChatData();
+        renderChatMessages();
+        
+        window.wcPendingReply = true;
+        window.wcPendingQuoteIndex = index;
+        
+        const quoteSnippet = document.getElementById('quoteSnippet');
+        if (quoteSnippet) quoteSnippet.innerText = `"${targetMsg.text}"`;
+        
+        const quoteIndicator = document.getElementById('quoteIndicator');
+        if (quoteIndicator) quoteIndicator.classList.add('active');
+
+    } else if (action === 'Copy') {
+        navigator.clipboard.writeText(targetMsg.text).then(() => {
+            // 复制成功，不做额外提示，保持高定感
+        });
         
     } else if (action === 'Redo') {
         if (targetMsg.role === 'bot') {
-            // 先删掉这条 AI 消息
-            chatMessages[contactName].splice(index, 1);
+            // 删除这条 AI 消息以及它之后的所有消息（保留它之前的上下文）
+            chatMessages[contactName].splice(index);
             saveWeChatData();
             renderChatMessages();
             // 然后根据剩余的完整上下文重新生成
             setTimeout(() => {
+                showTypingIndicator();
+                callChatAPI(currentChatContact, chatMessages[contactName]);
+            }, 100);
+        } else if (targetMsg.role === 'user') {
+            // 如果对用户消息点了 Redo，删除该消息及之后所有消息，然后重新发送该条
+            const userText = targetMsg.text;
+            chatMessages[contactName].splice(index);
+            saveWeChatData();
+            renderChatMessages();
+            setTimeout(() => {
+                const resendMsg = { role: 'user', text: userText, time: getCurrentTime() };
+                chatMessages[contactName].push(resendMsg);
+                saveWeChatData();
+                appendChatMessageToDOM(resendMsg);
                 showTypingIndicator();
                 callChatAPI(currentChatContact, chatMessages[contactName]);
             }, 100);
@@ -908,6 +1323,27 @@ function getCurrentTime() {
     const now = new Date();
     return now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
 }
+window.executeWcRewind = function() {
+    if (!currentLongPressRow || !currentChatContact) return;
+    
+    const index = parseInt(currentLongPressRow.getAttribute('data-index'));
+    const contactName = currentChatContact.name;
+    
+    // 如果已经是最后一条消息，无需回溯
+    if (index >= chatMessages[contactName].length - 1) {
+        closeWcContextMenu();
+        return; 
+    }
+
+    if (typeof playWcDangerSound === 'function') playWcDangerSound();
+    if (navigator.vibrate) navigator.vibrate([20, 30, 20]);
+    
+    // 核心逻辑：保留 0 到 index 的消息，删除 index 之后的所有消息
+    chatMessages[contactName].splice(index + 1);
+    saveWeChatData();
+    renderChatMessages();
+    closeWcContextMenu();
+};
 
 // ================= 7. 沉浸式感官反馈引擎 (Audio & Haptics) =================
 let wcAudioCtx = null;
@@ -918,6 +1354,95 @@ function initWcAudio() {
     }
     if (wcAudioCtx.state === 'suspended') {
         wcAudioCtx.resume();
+    }
+}
+
+function playWcClickSound() {
+    initWcAudio();
+    const osc = wcAudioCtx.createOscillator();
+    const gainNode = wcAudioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(800, wcAudioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(500, wcAudioCtx.currentTime + 0.06);
+    gainNode.gain.setValueAtTime(0.15, wcAudioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, wcAudioCtx.currentTime + 0.06);
+    osc.connect(gainNode);
+    gainNode.connect(wcAudioCtx.destination);
+    osc.start();
+    osc.stop(wcAudioCtx.currentTime + 0.06);
+}
+
+function playWcToggleOnSound() {
+    initWcAudio();
+    const osc = wcAudioCtx.createOscillator();
+    const gainNode = wcAudioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(500, wcAudioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(900, wcAudioCtx.currentTime + 0.1);
+    gainNode.gain.setValueAtTime(0.12, wcAudioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, wcAudioCtx.currentTime + 0.1);
+    osc.connect(gainNode);
+    gainNode.connect(wcAudioCtx.destination);
+    osc.start();
+    osc.stop(wcAudioCtx.currentTime + 0.1);
+}
+
+function playWcToggleOffSound() {
+    initWcAudio();
+    const osc = wcAudioCtx.createOscillator();
+    const gainNode = wcAudioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(700, wcAudioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(350, wcAudioCtx.currentTime + 0.1);
+    gainNode.gain.setValueAtTime(0.12, wcAudioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, wcAudioCtx.currentTime + 0.1);
+    osc.connect(gainNode);
+    gainNode.connect(wcAudioCtx.destination);
+    osc.start();
+    osc.stop(wcAudioCtx.currentTime + 0.1);
+}
+
+function playWcSaveSound() {
+    initWcAudio();
+    const t = wcAudioCtx.currentTime;
+    [600, 800, 1000].forEach((freq, i) => {
+        const osc = wcAudioCtx.createOscillator();
+        const gain = wcAudioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t + i * 0.08);
+        gain.gain.setValueAtTime(0.1, t + i * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + i * 0.08 + 0.12);
+        osc.connect(gain);
+        gain.connect(wcAudioCtx.destination);
+        osc.start(t + i * 0.08);
+        osc.stop(t + i * 0.08 + 0.12);
+    });
+}
+
+function playWcDangerSound() {
+    initWcAudio();
+    const t = wcAudioCtx.currentTime;
+    [400, 300].forEach((freq, i) => {
+        const osc = wcAudioCtx.createOscillator();
+        const gain = wcAudioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(freq, t + i * 0.12);
+        gain.gain.setValueAtTime(0.08, t + i * 0.12);
+        gain.gain.exponentialRampToValueAtTime(0.01, t + i * 0.12 + 0.1);
+        osc.connect(gain);
+        gain.connect(wcAudioCtx.destination);
+        osc.start(t + i * 0.12);
+        osc.stop(t + i * 0.12 + 0.1);
+    });
+}
+
+function triggerButtonFeedback(el) {
+    if (navigator.vibrate) navigator.vibrate(8);
+    playWcClickSound();
+    if (el) {
+        el.style.transition = 'transform 0.1s cubic-bezier(0.16, 1, 0.3, 1)';
+        el.style.transform = 'scale(0.93)';
+        setTimeout(() => { el.style.transform = ''; }, 120);
     }
 }
 
@@ -962,15 +1487,124 @@ function triggerWcHaptic(type) {
 // ================= 聊天室设置逻辑 =================
 let csUserAvatarData = '';
 let csAiAvatarData = '';
+let csChatBgData = null;
+
+function applyChatBg() {
+    const chatView = document.getElementById('wcChatView');
+    if (!chatView) return;
+    if (currentChatContact && currentChatContact.chatBg) {
+        chatView.style.backgroundImage = `url(${currentChatContact.chatBg})`;
+        chatView.style.backgroundSize = 'cover';
+        chatView.style.backgroundPosition = 'center';
+    } else {
+        chatView.style.backgroundImage = 'none';
+    }
+}
+
+function previewCsBg(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        csChatBgData = e.target.result;
+        const bgPreview = document.getElementById('wcCsBgPreview');
+        const bgPlaceholder = document.getElementById('wcCsBgPlaceholder');
+        bgPreview.style.backgroundImage = `url(${csChatBgData})`;
+        bgPlaceholder.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+    event.target.value = '';
+}
+
+function clearCsBg() {
+    csChatBgData = '';
+    const bgPreview = document.getElementById('wcCsBgPreview');
+    const bgPlaceholder = document.getElementById('wcCsBgPlaceholder');
+    bgPreview.style.backgroundImage = 'none';
+    bgPlaceholder.style.display = 'flex';
+}
 
 function openChatSettings() {
     if (!currentChatContact) return;
+    playWcClickSound();
+    if (navigator.vibrate) navigator.vibrate(8);
     document.getElementById('wcChatSettings').classList.add('active');
     
+    csChatBgData = null;
+    const bgPreview = document.getElementById('wcCsBgPreview');
+    const bgPlaceholder = document.getElementById('wcCsBgPlaceholder');
+    if (currentChatContact.chatBg) {
+        bgPreview.style.backgroundImage = `url(${currentChatContact.chatBg})`;
+        bgPlaceholder.style.display = 'none';
+    } else {
+        bgPreview.style.backgroundImage = 'none';
+        bgPlaceholder.style.display = 'flex';
+    }
+
     document.getElementById('wcCsUserName').value = currentChatContact.userName || 'Me';
-    document.getElementById('wcCsAiName').value = currentChatContact.name || '';
+    document.getElementById('wcCsAiName').value = currentChatContact.chatName || currentChatContact.name || '';
     document.getElementById('wcCsPersona').value = currentChatContact.persona || '';
     document.getElementById('wcCsBilingual').checked = currentChatContact.bilingual || false;
+    
+    const bilingualOptions = document.getElementById('wcCsBilingualOptions');
+    if (bilingualOptions) {
+        if (currentChatContact.bilingual) {
+            bilingualOptions.classList.add('open');
+        } else {
+            bilingualOptions.classList.remove('open');
+        }
+    }
+    
+    const savedLang = currentChatContact.bilingualLang || 'Chinese';
+    const langChips = document.querySelectorAll('#wcCsLangChips .cs-lang-pill');
+    let foundPreset = false;
+    langChips.forEach(chip => {
+        chip.classList.remove('active');
+        if (chip.getAttribute('onclick') && chip.getAttribute('onclick').includes("'" + savedLang + "'")) {
+            chip.classList.add('active');
+            foundPreset = true;
+        }
+    });
+    const customLangInput = document.getElementById('wcCsCustomLang');
+    if (customLangInput) {
+        customLangInput.value = foundPreset ? '' : savedLang;
+    }
+    
+    const bilingualCheckbox = document.getElementById('wcCsBilingual');
+    bilingualCheckbox.onchange = function() {
+        if (this.checked) {
+            playWcToggleOnSound();
+        } else {
+            playWcToggleOffSound();
+        }
+        if (navigator.vibrate) navigator.vibrate(10);
+        const opts = document.getElementById('wcCsBilingualOptions');
+        if (opts) {
+            if (this.checked) {
+                opts.classList.add('open');
+            } else {
+                opts.classList.remove('open');
+            }
+        }
+    };
+    
+    // 加载气泡风格
+    const savedStyle = currentChatContact.bubbleStyle || 'default';
+    document.querySelectorAll('#csStyleScroll .cs-style-option').forEach(o => {
+        o.classList.remove('active');
+        if (o.getAttribute('data-style') === savedStyle) o.classList.add('active');
+    });
+    const currentLabel = document.getElementById('csStyleCurrent');
+    if (currentLabel) currentLabel.textContent = savedStyle.toUpperCase();
+
+    // 加载照片风格
+    const savedPhotoStyle = currentChatContact.photoStyle || 'a';
+    document.querySelectorAll('#csPhotoScroll .cs-style-option').forEach(o => {
+        o.classList.remove('active');
+        if (o.getAttribute('data-style') === savedPhotoStyle) o.classList.add('active');
+    });
+    const currentPhotoLabel = document.getElementById('csPhotoCurrent');
+    if (currentPhotoLabel) currentPhotoLabel.textContent = savedPhotoStyle.toUpperCase();
     
     // 加载你的专属面具
     const userMaskInput = document.getElementById('wcCsUserMask');
@@ -995,10 +1629,25 @@ function openChatSettings() {
 
 function saveChatSettings() {
     if (!currentChatContact) return;
+    playWcSaveSound();
+    if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
     currentChatContact.userName = document.getElementById('wcCsUserName').value;
-    currentChatContact.name = document.getElementById('wcCsAiName').value;
+    currentChatContact.chatName = document.getElementById('wcCsAiName').value;
     currentChatContact.persona = document.getElementById('wcCsPersona').value;
     currentChatContact.bilingual = document.getElementById('wcCsBilingual').checked;
+    
+    const customLang = document.getElementById('wcCsCustomLang');
+    if (customLang && customLang.value.trim()) {
+        currentChatContact.bilingualLang = customLang.value.trim();
+    } else {
+        const activeChip = document.querySelector('#wcCsLangChips .cs-lang-pill.active');
+        if (activeChip) {
+            const match = activeChip.getAttribute('onclick').match(/'([^']+)'\)/);
+            currentChatContact.bilingualLang = match ? match[1] : 'Chinese';
+        } else {
+            currentChatContact.bilingualLang = 'Chinese';
+        }
+    }
     
     // 保存你的专属面具
     const userMaskInput = document.getElementById('wcCsUserMask');
@@ -1010,13 +1659,52 @@ function saveChatSettings() {
     const aAvatar = document.getElementById('wcCsAiAvatarPreview');
     if (aAvatar.style.display === 'block') currentChatContact.avatar = aAvatar.src;
     
+    if (csChatBgData !== null) {
+        currentChatContact.chatBg = csChatBgData;
+    }
+    
     saveWeChatData();
     renderContacts();
-    openChat(currentChatContact);
+    renderChats();
+    
+    const displayName = currentChatContact.chatName || currentChatContact.name;
+    document.getElementById('wcChatName').textContent = displayName;
+    const watermarkEl = document.getElementById('wcChatWatermark');
+    if (watermarkEl) watermarkEl.textContent = displayName.charAt(0).toUpperCase() + '.';
+    
+    const avatarEl = document.getElementById('wcChatAvatar');
+    if (currentChatContact.avatar) {
+        avatarEl.innerHTML = `<img src="${currentChatContact.avatar}" style="width:100%;height:100%;object-fit:cover;">`;
+    } else {
+        avatarEl.innerHTML = '🤖';
+    }
+    
+    applyChatBg();
+    renderChatMessages();
     closeChatSettings();
 }
 
+function previewCsAvatar(event, type) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        if (type === 'user') {
+            const img = document.getElementById('wcCsUserAvatarPreview');
+            const emoji = document.getElementById('wcCsUserAvatarEmoji');
+            img.src = e.target.result; img.style.display = 'block'; emoji.style.display = 'none';
+        } else {
+            const img = document.getElementById('wcCsAiAvatarPreview');
+            const emoji = document.getElementById('wcCsAiAvatarEmoji');
+            img.src = e.target.result; img.style.display = 'block'; emoji.style.display = 'none';
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
 function closeChatSettings() {
+    playWcClickSound();
+    if (navigator.vibrate) navigator.vibrate(6);
     const settingsPanel = document.getElementById('wcChatSettings');
     if (settingsPanel) {
         settingsPanel.classList.remove('active');
@@ -1025,6 +1713,8 @@ function closeChatSettings() {
 
 function clearChatHistory() {
     if (!currentChatContact) return;
+    playWcDangerSound();
+    if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
     if (!confirm('Delete all messages with ' + currentChatContact.name + '?')) return;
 
     chatMessages[currentChatContact.name] = [];
@@ -1160,16 +1850,25 @@ function renderUserMasks() {
         if (countBadge) countBadge.textContent = `MASKS (${userMasks.length})`;
     }
 
-    // 2. 渲染到“聊天设置”界面，去除了 Emoji
+    // 2. 渲染到"聊天设置"界面（便签纸条风格）
     const scrollContainer = document.getElementById('wcCsMaskScroll');
     if (scrollContainer) {
-        let chipsHtml = '';
-        userMasks.forEach(mask => {
+        let notesHtml = '';
+        userMasks.forEach((mask, idx) => {
             const safePrompt = mask.prompt.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-            chipsHtml += `<div class="wc-cs-mask-chip" onclick="applyCsMask(this, '${safePrompt}')" style="padding:6px 12px; border:1px solid #111; border-radius:8px; font-size:11px; font-weight:700; font-family:'Space Mono', monospace; cursor:pointer; white-space:nowrap; color:#111; transition:0.2s;">${mask.name}</div>`;
+            const numStr = (idx + 1).toString().padStart(2, '0');
+            const hintText = mask.prompt.length > 20 ? mask.prompt.substring(0, 20) + '...' : (mask.prompt || 'No prompt');
+            notesHtml += `<div class="cs-mask-note" onclick="applyCsMask(this, '${safePrompt}')">
+                <div class="cs-mask-note-num">NO.${numStr}</div>
+                <div class="cs-mask-note-name">${mask.name}</div>
+                <div class="cs-mask-note-hint">${hintText}</div>
+            </div>`;
         });
-        chipsHtml += `<div class="wc-cs-mask-chip" onclick="applyCsMask(this, '')" style="padding:6px 12px; border:1px dashed #999; border-radius:8px; font-size:11px; font-weight:700; font-family:'Space Mono', monospace; cursor:pointer; white-space:nowrap; color:#999; transition:0.2s;">+ Custom</div>`;
-        scrollContainer.innerHTML = chipsHtml;
+        notesHtml += `<div class="cs-mask-add" onclick="applyCsMask(this, '')">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            <span>New</span>
+        </div>`;
+        scrollContainer.innerHTML = notesHtml;
     }
 }
 
@@ -1221,13 +1920,14 @@ function saveUserMasks() {
 
 // 聊天设置中点击面具 Chip 的逻辑
 function applyCsMask(el, promptText) {
-    const chips = document.querySelectorAll('#wcCsMaskScroll .wc-cs-mask-chip');
-    chips.forEach(chip => {
-        chip.style.background = chip.innerText.includes('Custom') ? 'transparent' : 'transparent';
-        chip.style.color = chip.innerText.includes('Custom') ? '#999' : '#111';
-    });
-    el.style.background = '#111';
-    el.style.color = '#fff';
+    playWcClickSound();
+    if (navigator.vibrate) navigator.vibrate(6);
+    
+    const notes = document.querySelectorAll('#wcCsMaskScroll .cs-mask-note');
+    notes.forEach(note => note.classList.remove('active'));
+    if (el.classList.contains('cs-mask-note')) {
+        el.classList.add('active');
+    }
     
     const textarea = document.getElementById('wcCsUserMask');
     if (promptText !== '') {
@@ -1236,6 +1936,92 @@ function applyCsMask(el, promptText) {
     textarea.dispatchEvent(new Event('input'));
 }
 
+window.selectBubbleStyle = function(el, style) {
+    playWcClickSound();
+    if (navigator.vibrate) navigator.vibrate(8);
+    
+    document.querySelectorAll('#csStyleScroll .cs-style-option').forEach(o => o.classList.remove('active'));
+    el.classList.add('active');
+    
+    const currentLabel = document.getElementById('csStyleCurrent');
+    if (currentLabel) currentLabel.textContent = style.toUpperCase();
+    
+    if (currentChatContact) {
+        currentChatContact.bubbleStyle = style;
+        saveWeChatData();
+        applyBubbleStyle(style);
+    }
+};
+
+window.selectPhotoStyle = function(el, style) {
+    playWcClickSound();
+    if (navigator.vibrate) navigator.vibrate(8);
+    
+    document.querySelectorAll('#csPhotoScroll .cs-style-option').forEach(o => o.classList.remove('active'));
+    el.classList.add('active');
+    
+    const currentLabel = document.getElementById('csPhotoCurrent');
+    if (currentLabel) currentLabel.textContent = style.toUpperCase();
+    
+    if (currentChatContact) {
+        currentChatContact.photoStyle = style;
+        saveWeChatData();
+    }
+};
+
+function applyBubbleStyle(style) {
+    const chatMessages = document.getElementById('wcChatMessages');
+    if (!chatMessages) return;
+    
+    chatMessages.classList.remove('bubble-style-a', 'bubble-style-b', 'bubble-style-c', 'bubble-style-d', 'bubble-style-e', 'bubble-style-f');
+    if (style && style !== 'default') {
+        chatMessages.classList.add('bubble-style-' + style);
+    }
+}
+
+window.selectBilingualLang = function(el, lang) {
+    playWcClickSound();
+    if (navigator.vibrate) navigator.vibrate(6);
+    document.querySelectorAll('#wcCsLangChips .cs-lang-pill').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    const customInput = document.getElementById('wcCsCustomLang');
+    if (customInput) customInput.value = '';
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(loadWcMeProfile, 500);
+    
+    const chatMessagesArea = document.getElementById('wcChatMessages');
+    if (chatMessagesArea) {
+        chatMessagesArea.addEventListener('click', closeWcPlusMenu);
+    }
 });
+
+function toggleWcPlusMenu() {
+    const menu = document.getElementById('wcPlusMenu');
+    const btn = document.getElementById('clipBtn');
+    if (!menu || !btn) return;
+    
+    if (menu.classList.contains('active')) {
+        menu.classList.remove('active');
+        btn.style.transform = 'rotate(0deg)';
+        btn.style.background = 'rgba(0,0,0,0.04)';
+        btn.style.color = '#999';
+    } else {
+        menu.classList.add('active');
+        btn.style.transform = 'rotate(45deg)';
+        btn.style.background = '#111';
+        btn.style.color = '#fff';
+    }
+}
+
+function closeWcPlusMenu() {
+    const menu = document.getElementById('wcPlusMenu');
+    const btn = document.getElementById('clipBtn');
+    if (menu && menu.classList.contains('active')) {
+        menu.classList.remove('active');
+        btn.style.transform = 'rotate(0deg)';
+        btn.style.background = 'rgba(0,0,0,0.04)';
+        btn.style.color = '#999';
+    }
+}

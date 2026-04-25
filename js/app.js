@@ -130,6 +130,7 @@ let page1Items = [
     { id: 'app6', type: 'app', name: 'Archive', fill: 'tex-black', icon: '<div style="font-family: \'Cormorant Garamond\', serif; font-size: 34px; font-weight: bold; font-style: italic; color: #fff; line-height: 56px;">A</div>', col: 1, row: 5 },
     { id: 'app7', type: 'app', name: 'Camera', fill: 'tex-light', icon: '<svg viewBox="0 0 64 64"><rect x="10" y="40" width="44" height="14" fill="#111"/><circle cx="32" cy="35" r="8" fill="#111"/><path d="M10 40c10-5 20-5 44 0" fill="none" stroke="#111" stroke-width="2"/></svg>', col: 2, row: 5 },
     { id: 'app8', type: 'app', name: 'Settings', fill: 'tex-black', icon: '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="8" fill="none" stroke="currentColor" stroke-width="3"/><path d="M32 12v4M32 48v4M12 32h4M48 32h4M18 18l3 3M43 43l3 3M18 46l3-3M46 18l-3 3" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>', col: 3, row: 5 },
+    { id: 'app9', type: 'app', name: 'Encounter', fill: 'tex-dark', icon: '<div style="font-family: \'Cormorant Garamond\', serif; font-size: 30px; font-weight: bold; font-style: italic; color: #fff; line-height: 56px;">E.</div>', col: 0, row: 3 },
 ];
 
 function openSettings() {
@@ -408,7 +409,8 @@ function renderList(list, container) {
                 if(!isEditMode) {
                     if(item.name === 'Settings') openSettings();
                     if(item.name === 'WeChat') openWeChat();
-                    if(item.name === 'Archive') openWorldbook(); // 新增 Archive 点击事件
+                    if(item.name === 'Archive') openWorldbook();
+                    if(item.name === 'Encounter') openEncounter();
                 }
             };
         } else if (item.type === 'widget') {
@@ -561,6 +563,7 @@ function bindDesktopTouchEvents(el, itemData, listRef) {
             if (itemData.name === 'Settings') openSettings();
             else if (itemData.name === 'WeChat') openWeChat();
             else if (itemData.name === 'Archive') openWorldbook();
+            else if (itemData.name === 'Encounter') openEncounter();
         }
 
         if (draggedEl === el) endDrag();

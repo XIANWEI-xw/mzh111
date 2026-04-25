@@ -17,23 +17,25 @@ function saveCogData() {
 }
 
 function openCognition(contactName) {
+    if (typeof playWcClickSound === 'function') playWcClickSound();
+    if (navigator.vibrate) navigator.vibrate(8);
+    
     cogCurrentContact = contactName;
     if (!cogMemories[contactName]) {
         cogMemories[contactName] = [];
     }
     
-    // 初始化界面
     document.getElementById('cognitionApp').classList.add('active');
     
-    // 切换到 ALL 标签
-    document.querySelectorAll('.cog-filter-item').forEach(i => i.classList.remove('active'));
-    document.querySelector('.cog-filter-item[data-filter="ALL"]').classList.add('active');
+    document.querySelectorAll('.cog-filter-btn').forEach(i => i.classList.remove('active'));
+    document.querySelector('.cog-filter-btn[data-filter="ALL"]').classList.add('active');
     cogCurrentFilter = 'ALL';
     
     renderCogMemories();
 }
 
 function closeCognition() {
+    if (typeof playWcClickSound === 'function') playWcClickSound();
     document.getElementById('cognitionApp').classList.remove('active');
     cogCurrentContact = '';
 }
@@ -46,16 +48,19 @@ function renderCogMemories() {
 
     let memories = cogMemories[cogCurrentContact];
     
-    // 过滤
     let filtered = memories.filter(m => cogCurrentFilter === 'ALL' || m.type === cogCurrentFilter);
-    
-    // 排序
     filtered.sort((a, b) => cogWeight[b.type] - cogWeight[a.type]);
 
-    // 更新数量
-    document.getElementById('cogEntryCount').innerText = filtered.length.toString().padStart(2, '0');
+    // 更新统计
+    const coreCount = memories.filter(m => m.type === 'CORE').length;
+    const highCount = memories.filter(m => m.type === 'HIGH').length;
+    const traceCount = memories.filter(m => m.type === 'TRACE').length;
+    
+    document.getElementById('cogStatCore').innerText = coreCount.toString().padStart(2, '0');
+    document.getElementById('cogStatHigh').innerText = highCount.toString().padStart(2, '0');
+    document.getElementById('cogStatTrace').innerText = traceCount.toString().padStart(2, '0');
+    document.getElementById('cogStatTotal').innerText = memories.length.toString().padStart(2, '0');
 
-    // 渲染
     filtered.forEach((m, index) => {
         const numStr = (index + 1).toString().padStart(2, '0');
         let html = '';
@@ -63,45 +68,59 @@ function renderCogMemories() {
         if (m.type === 'CORE') {
             html = `
             <div class="cog-card-core cog-mem-card" style="animation-delay: ${index * 0.05}s" onclick="openCogEditor(${m.id})">
-                <span class="cog-card-label">${numStr} / CORE MEMORY</span>
-                <p class="cog-card-text">${m.text}</p>
-                <span class="cog-card-date">${m.date}</span>
+                <div class="cog-core-top">
+                    <div class="cog-core-badge">Core Memory</div>
+                    <div class="cog-core-num">${numStr}</div>
+                </div>
+                <div class="cog-core-text">${m.text}</div>
+                <div class="cog-core-footer">
+                    <div class="cog-core-date">${m.date}</div>
+                    <div class="cog-core-icon"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+                </div>
             </div>`;
         } else if (m.type === 'HIGH') {
             html = `
             <div class="cog-card-high cog-mem-card" style="animation-delay: ${index * 0.05}s" onclick="openCogEditor(${m.id})">
-                <div class="cog-label-row">
-                    <span class="cog-card-label">${numStr} / HIGH PRIORITY</span>
-                    <span class="cog-card-date">${m.date}</span>
+                <div class="cog-high-top">
+                    <div class="cog-high-badge">HIGH PRIORITY</div>
                 </div>
-                <p class="cog-card-text">${m.text}</p>
+                <div class="cog-high-text">${m.text}</div>
+                <div class="cog-high-footer">
+                    <div class="cog-high-date">${m.date}</div>
+                    <div class="cog-high-num">NO.${numStr}</div>
+                </div>
             </div>`;
         } else if (m.type === 'TRACE') {
             html = `
             <div class="cog-card-trace cog-mem-card" style="animation-delay: ${index * 0.05}s" onclick="openCogEditor(${m.id})">
-                <span class="cog-card-label">${numStr} / TRACE</span>
-                <p class="cog-card-text">${m.text}</p>
-                <span class="cog-card-date">${m.date}</span>
+                <div class="cog-trace-top">
+                    <span class="cog-trace-badge">TRACE</span>
+                    <span class="cog-trace-date">${m.date}</span>
+                </div>
+                <div class="cog-trace-text">${m.text}</div>
             </div>`;
         }
         container.insertAdjacentHTML('beforeend', html);
     });
 }
 
-// 绑定过滤点击
+window.filterCog = function(filterStr, el) {
+    if (typeof playWcClickSound === 'function') playWcClickSound();
+    if (navigator.vibrate) navigator.vibrate(5);
+    document.querySelectorAll('.cog-filter-btn').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    cogCurrentFilter = filterStr;
+    renderCogMemories();
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     loadCogData();
-    document.querySelectorAll('.cog-filter-item').forEach(item => {
-        item.onclick = () => {
-            document.querySelectorAll('.cog-filter-item').forEach(i => i.classList.remove('active'));
-            item.classList.add('active');
-            cogCurrentFilter = item.getAttribute('data-filter');
-            renderCogMemories();
-        };
-    });
 });
 
 function openCogEditor(id) {
+    if (typeof playWcClickSound === 'function') playWcClickSound();
+    if (navigator.vibrate) navigator.vibrate(8);
+    
     const editor = document.getElementById('cogEditor');
     const textInput = document.getElementById('cogEditText');
     const typeLabel = document.getElementById('cogEditType');
@@ -124,20 +143,30 @@ function openCogEditor(id) {
     }
 
     setCogPriority(cogCurrentEditType);
-    editor.style.display = 'flex';
-    setTimeout(() => editor.classList.add('active'), 10);
+    editor.classList.add('active');
 }
 
 function setCogPriority(level) {
+    if (typeof playWcClickSound === 'function') playWcClickSound();
+    if (navigator.vibrate) navigator.vibrate(5);
     cogCurrentEditType = level;
-    document.getElementById('cogEditType').innerText = level + ' MEMORY';
-    document.querySelectorAll('.cog-p-dot').forEach(d => {
-        if (d.getAttribute('data-level') === level) d.classList.add('active');
-        else d.classList.remove('active');
+    const typeLabel = document.getElementById('cogEditType');
+    if (level === 'CORE') typeLabel.innerText = 'CORE MEMORY';
+    else if (level === 'HIGH') typeLabel.innerText = 'HIGH PRIORITY';
+    else typeLabel.innerText = 'TRACE';
+    
+    document.querySelectorAll('.cog-p-btn').forEach(d => {
+        d.classList.remove('active-core', 'active-high', 'active-trace');
+        if (d.getAttribute('data-level') === level) {
+            d.classList.add('active-' + level.toLowerCase());
+        }
     });
 }
 
 function saveCogMem() {
+    if (typeof playWcSaveSound === 'function') playWcSaveSound();
+    if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
+    
     const text = document.getElementById('cogEditText').value.trim();
     if (!text) {
         closeCogEditor();
@@ -165,6 +194,9 @@ function saveCogMem() {
 }
 
 function deleteCogMem() {
+    if (typeof playWcDangerSound === 'function') playWcDangerSound();
+    if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+    
     if (cogCurrentEditId !== null) {
         cogMemories[cogCurrentContact] = cogMemories[cogCurrentContact].filter(m => m.id !== cogCurrentEditId);
         saveCogData();
@@ -176,7 +208,6 @@ function deleteCogMem() {
 function closeCogEditor() {
     const editor = document.getElementById('cogEditor');
     editor.classList.remove('active');
-    setTimeout(() => editor.style.display = 'none', 400);
 }
 
 // 供外部 AI 调用：将所有记忆拼接为字符串
