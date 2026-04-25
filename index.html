@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="css/cognition.css">
     <link rel="stylesheet" href="css/notification.css">
     <link rel="stylesheet" href="css/encounter.css">
+    <link rel="stylesheet" href="css/api-monitor.css">
 
 </head>
 <body class="iphone-frame-body" style="font-family: 'Nunito', -apple-system, sans-serif;">
@@ -1449,6 +1450,21 @@
 </div>
 
                     <div class="settings-card">
+                        <span class="settings-card-label">API Monitor / 接口监控</span>
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0;">
+                            <div>
+                                <div style="font-family:'Space Mono',monospace; font-size:10px; font-weight:700; color:#888; letter-spacing:1px;">ENABLE MONITOR</div>
+                                <div style="font-size:11px; color:#666; margin-top:4px;">Show floating orb & log API calls</div>
+                            </div>
+                            <label class="am-settings-toggle" style="position:relative; display:inline-block; width:44px; height:24px; cursor:pointer;">
+                                <input type="checkbox" id="setAmToggle" onchange="toggleAmEnabled(this.checked)" style="position:absolute; opacity:0; width:0; height:0;">
+                                <span style="position:absolute; inset:0; background:rgba(0,0,0,0.1); border-radius:12px; transition:.3s;"></span>
+                                <span style="position:absolute; top:2px; left:2px; width:20px; height:20px; background:#ccc; border-radius:50%; transition:.3s;"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
                         <span class="settings-card-label">Model Control / 采样设置</span>
                         <div class="settings-slider-wrap">
                             <div class="settings-slider-header">
@@ -1485,7 +1501,64 @@
     <script src="js/wechat.js"></script>
     <script src="js/worldbook.js"></script>
     <script src="js/cognition.js"></script>
-    <script src="js/notification.js"></script>
+    <script src="js/notification.js"></script>    
     <script src="js/encounter.js"></script>
+    <script src="js/api-monitor.js"></script>
+
+    <!-- API Monitor 悬浮球 -->
+    <div class="api-fab" id="apiFab" onclick="toggleApiMonitor()">
+        <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <div class="api-fab-badge" id="amFabBadge"></div>
+    </div>
+
+    <!-- API Monitor 面板 -->
+    <div class="api-monitor-overlay" id="apiMonitorOverlay" onclick="toggleApiMonitor()">
+        <div class="api-monitor" onclick="event.stopPropagation()">
+            <div class="am-topline"></div>
+            <div class="am-drag"></div>
+            <div class="am-header">
+                <div>
+                    <div class="am-title">Monitor.</div>
+                    <div class="am-subtitle">API Usage & Diagnostics</div>
+                </div>
+                <button class="am-close" onclick="toggleApiMonitor()">×</button>
+            </div>
+            <div class="am-stats">
+                <div class="am-stat">
+                    <div class="am-stat-num" id="amTotalTokens">0</div>
+                    <div class="am-stat-label">Total Tokens</div>
+                    <div class="am-stat-sub">session</div>
+                </div>
+                <div class="am-stat">
+                    <div class="am-stat-num" id="amInputTokens">0</div>
+                    <div class="am-stat-label">Input</div>
+                    <div class="am-stat-sub">prompt</div>
+                </div>
+                <div class="am-stat">
+                    <div class="am-stat-num" id="amOutputTokens">0</div>
+                    <div class="am-stat-label">Output</div>
+                    <div class="am-stat-sub">completion</div>
+                </div>
+            </div>
+            <div class="am-cost-bar">
+                <div class="am-cost-icon">$</div>
+                <div class="am-cost-text">Estimated Cost</div>
+                <div class="am-cost-val" id="amCost">$0.0000</div>
+            </div>
+            <div class="am-tabs">
+                <div class="am-tab active" onclick="switchAmTab(this, 'all')">All</div>
+                <div class="am-tab" onclick="switchAmTab(this, 'encounter')">Encounter</div>
+                <div class="am-tab" onclick="switchAmTab(this, 'wechat')">WeChat</div>
+            </div>
+            <div class="am-log-area" id="amLogArea">
+                <div class="am-empty"><div class="am-empty-icon">⚡</div><div class="am-empty-text">No API calls recorded</div></div>
+            </div>
+            <div class="am-footer">
+                <button class="am-footer-btn am-btn-clear" onclick="clearAmLogs()">Clear All</button>
+                <button class="am-footer-btn am-btn-export" onclick="exportAmLogs()">Export Log</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
+
