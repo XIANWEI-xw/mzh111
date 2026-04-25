@@ -4,20 +4,90 @@
    ============================================= */
 
 // ===== DOM 引用 =====
-const encApp = document.getElementById('encounterApp');
-const encSelectionScreen = document.getElementById('enc-selection-screen');
-const encStoryScreen = document.getElementById('enc-story-screen');
-const encProseContainer = document.getElementById('enc-prose-container');
-const encUserInput = document.getElementById('enc-user-input');
-const encHeartContainer = document.getElementById('enc-heart-container');
-const encQuickMenuPanel = document.getElementById('enc-quick-menu-panel');
-const encBtnQuickMenu = document.getElementById('enc-btn-quick-menu');
-const encFabSettings = document.getElementById('enc-fab-settings');
-const encSettingsOverlay = document.getElementById('enc-settings-overlay');
-const encPersonaOverlay = document.getElementById('enc-persona-overlay');
-const encClimaxSlider = document.getElementById('enc-climax-slider');
-const encClimaxValue = document.getElementById('enc-climax-value');
-const encVignette = document.getElementById('enc-intimate-vignette');
+let encApp, encSelectionScreen, encStoryScreen, encProseContainer, encUserInput;
+let encHeartContainer, encQuickMenuPanel, encBtnQuickMenu, encFabSettings;
+let encSettingsOverlay, encPersonaOverlay, encClimaxSlider, encClimaxValue, encVignette;
+
+function initEncounterDOM() {
+    encApp = document.getElementById('encounterApp');
+    encSelectionScreen = document.getElementById('enc-selection-screen');
+    encStoryScreen = document.getElementById('enc-story-screen');
+    encProseContainer = document.getElementById('enc-prose-container');
+    encUserInput = document.getElementById('enc-user-input');
+    encHeartContainer = document.getElementById('enc-heart-container');
+    encQuickMenuPanel = document.getElementById('enc-quick-menu-panel');
+    encBtnQuickMenu = document.getElementById('enc-btn-quick-menu');
+    encFabSettings = document.getElementById('enc-fab-settings');
+    encSettingsOverlay = document.getElementById('enc-settings-overlay');
+    encPersonaOverlay = document.getElementById('enc-persona-overlay');
+    encClimaxSlider = document.getElementById('enc-climax-slider');
+    encClimaxValue = document.getElementById('enc-climax-value');
+    encVignette = document.getElementById('enc-intimate-vignette');
+
+    if (encClimaxSlider) {
+        encClimaxSlider.addEventListener('input', function() {
+            const val = this.value;
+            if (encClimaxValue) encClimaxValue.innerText = val + '%';
+            const opacity = (val / 100) * 0.45;
+            if (encVignette) {
+                encVignette.style.background = `radial-gradient(circle, transparent 40%, rgba(217,122,141, ${opacity}) 100%)`;
+                if (val > 80) encVignette.style.animation = 'encBreathVignette 1.2s ease-in-out infinite alternate';
+                else if (val > 50) encVignette.style.animation = 'encBreathVignette 2.5s ease-in-out infinite alternate';
+                else encVignette.style.animation = 'none';
+            }
+        });
+
+        encClimaxSlider.addEventListener('change', function() {
+            const val = parseInt(this.value);
+            if (Math.abs(val - encLastClimaxVal) > 5) {
+                encLastClimaxVal = val;
+                let stateText = '';
+                if (val < 30) stateText = '呼吸平稳，保持理智';
+                else if (val < 60) stateText = '体温微升，心跳逐渐加快';
+                else if (val < 90) stateText = '意乱情迷，眼神开始涣散';
+                else stateText = '濒临临界，理智彻底失控';
+                if (encProseContainer) {
+                    encProseContainer.insertAdjacentHTML('beforeend', `
+                        <div class="enc-prose-divider" style="color:rgba(217,122,141,0.3);">· · ·</div>
+                        <div class="enc-story-tag enc-intimate-tag">✦ Sensory Sync: ${stateText} (${val}%) ✦</div>
+                    `);
+                }
+                const content = document.getElementById('enc-story-content');
+                if (content) content.scrollTo({ top: 99999, behavior: 'smooth' });
+                setTimeout(() => generateEncAIResponse(), 800);
+            }
+        });
+    }
+
+    if (encUserInput) {
+        encUserInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendEncAction(); }
+        });
+    }
+
+    document.querySelectorAll('.enc-set-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.parentNode.querySelectorAll('.enc-set-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            saveEncSettings();
+        });
+    });
+
+    document.addEventListener('click', function(e) {
+        if (encQuickMenuPanel && encBtnQuickMenu && !encQuickMenuPanel.contains(e.target) && !encBtnQuickMenu.contains(e.target)) {
+            encQuickMenuPanel.classList.remove('active');
+            encBtnQuickMenu.classList.remove('active');
+        }
+    });
+
+    console.log('✅ Encounter DOM initialized');
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initEncounterDOM);
+} else {
+    initEncounterDOM();
+}
 
 let encHeartInterval;
 let encFabTimeout;
@@ -386,39 +456,7 @@ function toggleEncIntimateMode() {
     }
 }
 
-// ===== 感官同步滑块 =====
-encClimaxSlider.addEventListener('input', function() {
-    const val = this.value;
-    encClimaxValue.innerText = val + '%';
-    const opacity = (val / 100) * 0.45;
-    encVignette.style.background = `radial-gradient(circle, transparent 40%, rgba(217,122,141, ${opacity}) 100%)`;
-    if (val > 80) encVignette.style.animation = 'encBreathVignette 1.2s ease-in-out infinite alternate';
-    else if (val > 50) encVignette.style.animation = 'encBreathVignette 2.5s ease-in-out infinite alternate';
-    else encVignette.style.animation = 'none';
-});
-
-encClimaxSlider.addEventListener('change', function() {
-    const val = parseInt(this.value);
-    if (Math.abs(val - encLastClimaxVal) > 5) {
-        encLastClimaxVal = val;
-        let stateText = '';
-        if (val < 30) stateText = '呼吸平稳，保持理智';
-        else if (val < 60) stateText = '体温微升，心跳逐渐加快';
-        else if (val < 90) stateText = '意乱情迷，眼神开始涣散';
-        else stateText = '濒临临界，理智彻底失控';
-
-        encProseContainer.insertAdjacentHTML('beforeend', `
-            <div class="enc-prose-divider" style="color:rgba(217,122,141,0.3);">· · ·</div>
-            <div class="enc-story-tag enc-intimate-tag">✦ Sensory Sync: ${stateText} (${val}%) ✦</div>
-        `);
-
-        document.getElementById('enc-story-content').scrollTo({ top: 99999, behavior: 'smooth' });
-
-        // 滑块值已经通过 buildEncSystemPrompt → getEncIntimateState() 自动注入系统提示词
-        // 不需要额外插入隐藏块，直接调用 AI 续写即可
-        setTimeout(() => generateEncAIResponse(), 800);
-    }
-});
+// ===== 感官同步滑块 → 已移入 initEncounterDOM() =====
 
 // ===== 内心独白展开 =====
 function toggleEncThought(el) {
@@ -952,10 +990,7 @@ function sendEncAction() {
     }
 }
 
-// Enter 发送
-encUserInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendEncAction(); }
-});
+// Enter 发送 → 已移入 initEncounterDOM()
 
 // ===== Quick Menu =====
 function toggleEncQuickMenu() {
@@ -963,12 +998,7 @@ function toggleEncQuickMenu() {
     encQuickMenuPanel.classList.toggle('active');
 }
 
-document.addEventListener('click', function(e) {
-    if (encQuickMenuPanel && !encQuickMenuPanel.contains(e.target) && !encBtnQuickMenu.contains(e.target)) {
-        encQuickMenuPanel.classList.remove('active');
-        encBtnQuickMenu.classList.remove('active');
-    }
-});
+// Quick Menu 点击关闭 → 已移入 initEncounterDOM()
 
 function applyEncQuickMenu() {
     const scene = document.getElementById('enc-qm-scene').value.trim();
@@ -1039,14 +1069,7 @@ function closeEncSettings(e) {
     }
 }
 
-// 设置按钮组交互
-document.querySelectorAll('.enc-set-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        this.parentNode.querySelectorAll('.enc-set-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        saveEncSettings();
-    });
-});
+// 设置按钮组交互 → 已移入 initEncounterDOM()
 
 // ===== Encounter 设置持久化 =====
 function saveEncSettings() {

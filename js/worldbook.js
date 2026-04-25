@@ -76,8 +76,21 @@ async function loadWbData() {
     }
 }
 
-// 立即加载
-loadWbData();
+// 页面加载完成后安全加载
+(async function() {
+    try {
+        await loadWbData();
+        console.log('✅ Worldbook loaded, entries:', worldbookEntries.length);
+    } catch(e) {
+        console.error('Worldbook load failed, using fallback:', e);
+        try {
+            const lsData = localStorage.getItem('worldbookData');
+            if (lsData) worldbookEntries = JSON.parse(lsData);
+        } catch(e2) {
+            worldbookEntries = [];
+        }
+    }
+})();
 
 function openWorldbook() {
     document.getElementById('worldbookApp').classList.add('active');
