@@ -789,7 +789,7 @@ async function callChatAPI(contact, messages) {
     const temperature = settings.temp ? parseFloat(settings.temp) : (tempEl ? parseFloat(tempEl.textContent) : 0.7);
 
     const amStartTime = Date.now();
-    if (typeof amSetCalling === 'function') amSetCalling(true);
+    if (typeof amSetCalling === 'function') amSetCalling(true, 'WeChat', model);
 
     try {
         const response = await fetch(apiUrl + '/chat/completions', {
@@ -806,7 +806,7 @@ async function callChatAPI(contact, messages) {
         });
 
         removeTypingIndicator();
-        if (typeof amSetCalling === 'function') amSetCalling(false);
+        if (typeof amSetCalling === 'function') amSetCalling(false, 'WeChat', model);
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -897,7 +897,7 @@ async function callChatAPI(contact, messages) {
 
     } catch (error) {
         removeTypingIndicator();
-        if (typeof amSetCalling === 'function') amSetCalling(false);
+        if (typeof amSetCalling === 'function') amSetCalling(false, 'WeChat', model);
         if (typeof logApiCall === 'function') {
             logApiCall({
                 model: model, source: 'WeChat', status: 0, statusText: 'Network Error',

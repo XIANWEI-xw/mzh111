@@ -809,7 +809,7 @@ async function callEncAI(apiUrl, apiToken, apiModel) {
     const wordLimit = getEncWordLimit();
 
     const amStartTime = Date.now();
-    if (typeof amSetCalling === 'function') amSetCalling(true);
+    if (typeof amSetCalling === 'function') amSetCalling(true, 'Encounter', apiModel);
 
     try {
         const response = await fetch(`${apiUrl.replace(/\/+$/, '')}/chat/completions`, {
@@ -827,7 +827,7 @@ async function callEncAI(apiUrl, apiToken, apiModel) {
         });
 
         removeEncLoadingBlock();
-        if (typeof amSetCalling === 'function') amSetCalling(false);
+        if (typeof amSetCalling === 'function') amSetCalling(false, 'Encounter', apiModel);
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -888,7 +888,7 @@ async function callEncAI(apiUrl, apiToken, apiModel) {
     } catch (e) {
         console.error('Encounter AI error:', e);
         removeEncLoadingBlock();
-        if (typeof amSetCalling === 'function') amSetCalling(false);
+        if (typeof amSetCalling === 'function') amSetCalling(false, 'Encounter', apiModel);
         if (typeof logApiCall === 'function') {
             logApiCall({
                 model: apiModel, source: 'Encounter', status: 0, statusText: 'Network Error',

@@ -1,4 +1,217 @@
-// ===== API Monitor · 全局 API 监控系统 =====
+function updateAmFabVisibility() {
+    const fab = document.getElementById('apiFab');
+    const orb = document.getElementById('timerOrb');
+    const conn = document.getElementById('orbConnector');
+    if (fab) {
+        if (amEnabled) fab.classList.add('visible');
+        else fab.classList.remove('visible');
+    }
+    if (orb) {
+        if (amEnabled) orb.classList.add('visible');
+        else orb.classList.remove('visible');
+    }
+    if (conn) {
+        if (amEnabled) conn.classList.add('visible');
+        else conn.classList.remove('visible');
+    }
+}
+
+// ===== 计时器系统 =====
+let amTimerRunning = false;
+let amTimerStart = 0;
+let amTimerElapsed = 0;
+let amTimerInterval = null;
+let amTimerLaps = [];
+let amTimerLastLap = 0;
+let amTimerCurrentSource = '';
+let amTimerCurrentModel = '';
+const amOrbCircum = 2 * Math.PI * 22.5;
+
+function toggleTimerPanel() {
+    const overlay = document.getElementById('tpOverlay');
+    if (overlay) overlay.classList.toggle('active');
+}
+
+// API 调用开始时自动调用：每次从 0 重新计时
+function amAutoTimerStart(source, model) {
+    amTimerCurrentSource = source || '';
+    amTimerCurrentModel = model || '';
+
+    // 每次调用都重置并从 0 开始
+    clearInterval(amTimerInterval);
+    amTimerElapsed = 0;
+    amTimerStart = Date.now();
+    amTimerInterval = setInterval(updateAmTimerDisplay, 30);
+    amTimerRunning = true;
+    updateTimerButtons(true);
+
+    // 重置进度环
+    const prog = document.getElementById('orbProgress');
+    if (prog) prog.style.strokeDashoffset = amOrbCircum;
+
+    const orb = document.getElementById('timerOrb');
+    if (orb) { orb.classList.add('running'); orb.classList.remove('paused'); }
+}
+
+// API 调用结束时自动调用：停止计时，记录本次耗时
+function amAutoTimerStop() {
+    if (amTimerRunning) {
+        clearInterval(amTimerInterval);
+        amTimerRunning = false;
+
+        const elapsed = Date.now() - amTimerStart;
+        amTimerElapsed = elapsed;
+
+        amTimerLaps.push({
+            time: elapsed,
+            diff: elapsed,
+            source: amTimerCurrentSource,
+            model: amTimerCurrentModel
+        });
+
+        renderAmTimerLaps();
+        updateTimerButtons(false);
+        const orb = document.getElementById('timerOrb');
+        if (orb) { orb.classList.remove('running'); orb.classList.add('paused'); }
+    }
+}
+
+// 手动开始/暂停
+function toggleAmTimer() {
+    if (amTimerRunning) {
+        clearInterval(amTimerInterval);
+        amTimerRunning = false;
+        updateTimerButtons(false);
+        const orb = document.getElementById('timerOrb');
+        if (orb) { orb.classList.remove('running'); orb.classList.add('paused'); }
+    } else {
+        amTimerStart = Date.now() - amTimerElapsed;
+        amTimerInterval = setInterval(updateAmTimerDisplay, 30);
+        amTimerRunning = true;
+        updateTimerButtons(true);
+        const orb = document.getElementById('timerOrb');
+        if (orb) { orb.classList.add('running'); orb.classList.remove('paused'); }
+    }
+}
+
+function resetAmTimer() {
+    clearInterval(amTimerInterval);
+    amTimerRunning = false;
+    amTimerElapsed = 0;
+    amTimerStart = 0;
+    amTimerLaps = [];
+    amTimerLastLap = 0;
+
+    const els = {
+        tpTime: '00:00', tpMs: '.00', orbTime: '00:00', orbMs: '.00'
+    };
+    Object.keys(els).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = els[id];
+    });
+
+    const prog = document.getElementById('orbProgress');
+    if (prog) prog.style.strokeDashoffset = amOrbCircum;
+
+    updateTimerButtons(false);
+    const orb = document.getElementById('timerOrb');
+    if (orb) orb.classList.remove('running', 'paused');
+
+    const laps = document.getElementById('tpLaps');
+    if (laps) laps.innerHTML = '<div class="tp-laps-empty">— API calls auto-record here —</div>';
+    const cnt = document.getElementById('tpLapCount');
+    if (cnt) cnt.textContent = '0 LAPS';
+}
+
+function addAmLap() {
+    if (!amTimerRunning) return;
+    const t = amTimerElapsed;
+    const diff = t - amTimerLastLap;
+    amTimerLastLap = t;
+    amTimerLaps.push({ time: t, diff: diff, source: 'Manual', model: '' });
+    renderAmTimerLaps();
+}
+
+function updateAmTimerDisplay() {
+    amTimerElapsed = Date.now() - amTimerStart;
+    const sec = amTimerElapsed / 1000;
+    const m = Math.floor(sec / 60).toString().padStart(2, '0');
+    const s = Math.floor(sec % 60).toString().padStart(2, '0');
+    const cs = Math.floor((sec % 1) * 100).toString().padStart(2, '0');
+
+    const tpTime = document.getElementById('tpTime');
+    const tpMs = document.getElementById('tpMs');
+    const orbTime = document.getElementById('orbTime');
+    const orbMs = document.getElementById('orbMs');
+    if (tpTime) tpTime.textContent = `${m}:${s}`;
+    if (tpMs) tpMs.textContent = `.${cs}`;
+    if (orbTime) orbTime.textContent = `${m}:${s}`;
+    if (orbMs) orbMs.textContent = `.${cs}`;
+
+    const progress = (sec % 60) / 60;
+    const offset = amOrbCircum * (1 - progress);
+    const prog = document.getElementById('orbProgress');
+    if (prog) prog.style.strokeDashoffset = offset;
+}
+
+function updateTimerButtons(isRunning) {
+    const btn = document.getElementById('tpBtnMain');
+    const play = document.getElementById('tpIconPlay');
+    const pause = document.getElementById('tpIconPause');
+    if (btn) btn.classList.toggle('running', isRunning);
+    if (play) play.style.display = isRunning ? 'none' : '';
+    if (pause) pause.style.display = isRunning ? '' : 'none';
+}
+
+function renderAmTimerLaps() {
+    const container = document.getElementById('tpLaps');
+    const countEl = document.getElementById('tpLapCount');
+    if (!container) return;
+
+    if (amTimerLaps.length === 0) {
+        container.innerHTML = '<div class="tp-laps-empty">— API calls auto-record here —</div>';
+        if (countEl) countEl.textContent = '0 LAPS';
+        return;
+    }
+
+    let fastest = Infinity, slowest = 0;
+    amTimerLaps.forEach(l => {
+        if (l.diff < fastest) fastest = l.diff;
+        if (l.diff > slowest) slowest = l.diff;
+    });
+
+    let html = '';
+    for (let i = amTimerLaps.length - 1; i >= 0; i--) {
+        const l = amTimerLaps[i];
+        const num = (i + 1).toString().padStart(2, '0');
+        let tag = '';
+        if (amTimerLaps.length >= 3) {
+            if (l.diff === fastest) tag = '<span class="tp-lap-tag fast">FAST</span>';
+            else if (l.diff === slowest) tag = '<span class="tp-lap-tag slow">SLOW</span>';
+        }
+        const srcLabel = l.source ? `<span class="tp-lap-src">${l.source}</span>` : '';
+        html += `<div class="tp-lap">
+            <div class="tp-lap-left">
+                <span class="tp-lap-num">#${num}</span>
+                ${srcLabel}${tag}
+            </div>
+            <div class="tp-lap-right">
+                <div class="tp-lap-time">${fmtAmTime(l.diff)}</div>
+                <div class="tp-lap-diff">@ ${fmtAmTime(l.time)}</div>
+            </div>
+        </div>`;
+    }
+    container.innerHTML = html;
+    if (countEl) countEl.textContent = amTimerLaps.length + ' LAPS';
+}
+
+function fmtAmTime(ms) {
+    const s = ms / 1000;
+    const m = Math.floor(s / 60).toString().padStart(2, '0');
+    const sec = Math.floor(s % 60).toString().padStart(2, '0');
+    const cs = Math.floor((s % 1) * 100).toString().padStart(2, '0');
+    return `${m}:${sec}.${cs}`;
+}
 let amLogs = [];
 let amTotalInput = 0;
 let amTotalOutput = 0;
@@ -77,14 +290,6 @@ async function amDbGet(key) {
     updateAmFabVisibility();
 })();
 
-function updateAmFabVisibility() {
-    const fab = document.getElementById('apiFab');
-    if (fab) {
-        if (amEnabled) fab.classList.add('visible');
-        else fab.classList.remove('visible');
-    }
-}
-
 function toggleAmEnabled(isOn) {
     amEnabled = isOn;
     localStorage.setItem('amEnabled', isOn ? 'true' : 'false');
@@ -157,11 +362,15 @@ function estimateTokens(text) {
 }
 
 // ===== 悬浮球调用中状态 =====
-function amSetCalling(isCalling) {
+function amSetCalling(isCalling, source, model) {
     const fab = document.getElementById('apiFab');
     if (fab) {
         if (isCalling) fab.classList.add('calling');
         else fab.classList.remove('calling');
+    }
+    if (amEnabled) {
+        if (isCalling) amAutoTimerStart(source || '', model || '');
+        else amAutoTimerStop();
     }
 }
 
