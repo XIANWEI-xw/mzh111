@@ -1505,6 +1505,61 @@
     <script src="js/encounter.js"></script>
     <script src="js/api-monitor.js"></script>
 
+    <!-- 计时悬浮球 -->
+    <div class="orb-connector" id="orbConnector"></div>
+    <div class="timer-orb" id="timerOrb" onclick="toggleTimerPanel()">
+        <div class="timer-orb-ring">
+            <svg class="timer-orb-svg" viewBox="0 0 50 50">
+                <circle class="timer-orb-track" cx="25" cy="25" r="22.5"/>
+                <circle class="timer-orb-progress" id="orbProgress" cx="25" cy="25" r="22.5"/>
+            </svg>
+            <div class="timer-orb-text">
+                <div class="timer-orb-time" id="orbTime">00:00</div>
+                <div class="timer-orb-ms" id="orbMs">.00</div>
+            </div>
+        </div>
+        <div class="timer-orb-label">TIMER</div>
+    </div>
+
+    <!-- 计时器面板 -->
+    <div class="timer-panel-overlay" id="tpOverlay" onclick="toggleTimerPanel()">
+        <div class="timer-panel" onclick="event.stopPropagation()">
+            <div class="tp-topline"></div>
+            <div class="tp-header">
+                <div class="tp-title">Timer.</div>
+                <button class="tp-close" onclick="toggleTimerPanel()">×</button>
+            </div>
+            <div class="tp-display">
+                <div class="tp-time" id="tpTime">00:00</div>
+                <div class="tp-ms" id="tpMs">.00</div>
+                <div class="tp-elapsed">Elapsed</div>
+            </div>
+            <div class="tp-controls">
+                <button class="tp-btn tp-btn-reset" onclick="resetAmTimer()" title="Reset">
+                    <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                </button>
+                <button class="tp-btn tp-btn-main" id="tpBtnMain" onclick="toggleAmTimer()" title="Start / Stop">
+                    <svg viewBox="0 0 24 24" id="tpIconPlay"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                    <svg viewBox="0 0 24 24" id="tpIconPause" style="display:none;"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+                </button>
+                <button class="tp-btn tp-btn-lap" onclick="addAmLap()" title="Lap">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </button>
+            </div>
+            <div class="tp-laps-header">
+                <div class="tp-laps-title">Laps</div>
+                <div class="tp-laps-count" id="tpLapCount">0 LAPS</div>
+            </div>
+            <div class="tp-laps" id="tpLaps">
+                <div class="tp-laps-empty">— API calls auto-record here —</div>
+            </div>
+            <div class="tp-footer">
+                <div class="tp-footer-diamond"></div>
+                <div class="tp-footer-text">Studio Zero · Timer</div>
+            </div>
+        </div>
+    </div>
+
     <!-- API Monitor 悬浮球 -->
     <div class="api-fab" id="apiFab" onclick="toggleApiMonitor()">
         <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
